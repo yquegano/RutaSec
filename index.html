@@ -158,6 +158,11 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .cred-link-name{font-size:13px;font-weight:700;margin-bottom:2px}
 .cred-link-url{font-size:11px;color:var(--muted)}
 
+/* TTS BUTTON */
+.tts-btn{display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;letter-spacing:.3px;font-family:inherit}
+.tts-btn:hover{background:rgba(255,255,255,.1);color:var(--text);border-color:var(--muted)}
+.tts-btn.playing{border-color:var(--accent2);color:var(--accent2);background:rgba(16,185,129,.08)}
+
 /* EVAL */
 .eval-card{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:all .2s}
 .eval-card:hover{border-color:var(--accent)}
@@ -1692,6 +1697,99 @@ if(state.lastStudy!==today){
 
 // Guardar cada 2 min
 setInterval(saveState, 120000);
+
+// ══════════════════════════════════════
+// TTS — AUDIO: Debes saber, Consejo del Inspector + Glosario
+// ══════════════════════════════════════
+(function initTTS(){
+  let currentBtn=null;
+
+  function extractText(btn){
+    // Glosario: leer "término: definición"
+    const glos=btn.closest('.glosario-item');
+    if(glos){
+      const term=glos.querySelector('.glosario-term');
+      const def=glos.querySelector('.glosario-def');
+      return (term?term.innerText.trim()+'. ':'')+( def?def.innerText.trim():'');
+    }
+    // Bloques saber / inspector
+    const block=btn.closest('.block-saber,.block-inspector');
+    if(block){
+      const bodyEl=block.querySelector('.block-body');
+      const clone=bodyEl.cloneNode(true);
+      const b=clone.querySelector('.tts-btn');
+      if(b) b.remove();
+      return (clone.innerText||clone.textContent).trim();
+    }
+    return '';
+  }
+
+  window.secSpeak=function(btn){
+    const wasCurrent=(currentBtn===btn);
+    if(speechSynthesis.speaking) speechSynthesis.cancel();
+    if(currentBtn){
+      currentBtn.innerHTML='🔊 Escuchar';
+      currentBtn.classList.remove('playing');
+      currentBtn=null;
+    }
+    if(wasCurrent) return;
+
+    const text=extractText(btn);
+    if(!text) return;
+
+    const utt=new SpeechSynthesisUtterance(text);
+    utt.lang='es-CL';
+    utt.rate=0.9;
+    utt.pitch=1.05;
+
+    function setVoiceAndSpeak(){
+      const voices=speechSynthesis.getVoices();
+      const esVoice=voices.find(v=>v.lang.startsWith('es'));
+      if(esVoice) utt.voice=esVoice;
+      utt.onend=utt.onerror=function(){
+        if(currentBtn===btn){
+          btn.innerHTML='🔊 Escuchar';
+          btn.classList.remove('playing');
+          currentBtn=null;
+        }
+      };
+      btn.innerHTML='⏹ Detener';
+      btn.classList.add('playing');
+      currentBtn=btn;
+      speechSynthesis.speak(utt);
+    }
+
+    if(speechSynthesis.getVoices().length>0){
+      setVoiceAndSpeak();
+    } else {
+      speechSynthesis.onvoiceschanged=function(){
+        speechSynthesis.onvoiceschanged=null;
+        setVoiceAndSpeak();
+      };
+      setTimeout(setVoiceAndSpeak,400);
+    }
+  };
+
+  function addBtn(container){
+    const btn=document.createElement('button');
+    btn.className='tts-btn';
+    btn.innerHTML='🔊 Escuchar';
+    btn.setAttribute('title','Escuchar esta sección');
+    btn.onclick=function(){ secSpeak(btn); };
+    container.appendChild(btn);
+  }
+
+  // Bloques Debes saber y Consejo del Inspector
+  document.querySelectorAll('.block-saber,.block-inspector').forEach(function(block){
+    const body=block.querySelector('.block-body');
+    if(body) addBtn(body);
+  });
+
+  // Glosario — uno por uno (se renderizan antes que initTTS)
+  document.querySelectorAll('.glosario-item').forEach(function(item){
+    addBtn(item);
+  });
+})();
 </script>
 </body>
 </html>
