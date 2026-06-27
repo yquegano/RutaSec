@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1">
+<title>Ruta SEC · Clase 3 Gas</title>
+<style>
+:root{
+  --bg:#0d0f14;--surface:#161a22;--surface2:#1e2330;--border:#2a3040;
+  --accent:#2563eb;--accent2:#10b981;--accent3:#f59e0b;--accent4:#4ade80;
+  --danger:#ef4444;--text:#e8edf5;--muted:#7a8599;
+  --radius:14px;--radius-sm:8px
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px 10px;position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.logo{font-size:20px;font-weight:900;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo span{-webkit-text-fill-color:#e8edf5;font-weight:400;font-size:13px;margin-left:6px;opacity:.6}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.xp-badge{background:var(--surface2);border:1px solid var(--border);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;color:var(--accent3)}
+.streak-badge{background:var(--surface2);border:1px solid var(--border);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;color:#ff6b35}
+
+/* NAV */
+.nav{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--border);scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nav-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.nav-btn.done{border-color:var(--accent2);color:var(--accent2)}
+
+/* LAYOUT */
+.main{padding:16px;max-width:640px;margin:0 auto}
+.screen{display:none}.screen.active{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.card-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+
+/* PROGRESS */
+.prog-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s}
+
+/* DASHBOARD */
+.dash-hero{background:linear-gradient(135deg,#0f1829,#0f2318);border:1px solid var(--accent);border-radius:var(--radius);padding:22px 20px;margin-bottom:16px}
+.dash-greeting{font-size:13px;color:var(--muted);margin-bottom:4px}
+.dash-name{font-size:22px;font-weight:900;margin-bottom:16px}
+.dash-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-box{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px}
+.stat-val{font-size:24px;font-weight:900;color:var(--accent2);line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.dash-prob{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.3);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.prob-lbl{font-size:12px;color:var(--muted)}
+.prob-val{font-size:26px;font-weight:900;color:var(--accent)}
+
+.comp-grid{display:grid;gap:10px}
+.comp-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.comp-row:hover{border-color:var(--accent);background:var(--surface2)}
+.comp-icon{font-size:22px;width:40px;height:40px;background:var(--surface2);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.comp-info{flex:1}
+.comp-name{font-size:14px;font-weight:700;margin-bottom:3px}
+.comp-sub{font-size:11px;color:var(--muted);margin-bottom:6px}
+.comp-pct{font-size:11px;font-weight:700;color:var(--accent2);margin-bottom:4px}
+.comp-lock{font-size:18px;color:var(--muted)}
+
+/* MODULE HEADER */
+.mod-header{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;margin-bottom:16px;text-align:center}
+.mod-icon{font-size:46px;margin-bottom:10px}
+.mod-tag{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.mod-title{font-size:22px;font-weight:900;margin-bottom:6px}
+.mod-desc{font-size:13px;color:var(--muted);max-width:400px;margin:0 auto 14px;line-height:1.5}
+.mod-meta{display:flex;justify-content:center;gap:16px;font-size:11px;color:var(--muted)}
+
+/* BACK */
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);background:none;border:none;cursor:pointer;margin-bottom:16px;padding:0}
+.back-btn:hover{color:var(--text)}
+
+/* LESSON BLOCKS */
+.block{border-radius:var(--radius-sm);padding:13px 15px;margin-bottom:12px}
+.block-lbl{font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:7px}
+.block-body{font-size:13px;line-height:1.65;color:var(--text)}
+.block-objetivo{background:#0f1e3a;border:1px solid #1e3a7a;border-left:3px solid var(--accent)}
+.block-objetivo .block-lbl{color:var(--accent)}
+.block-saber{background:#0f1e1a;border:1px solid #1a3a2a;border-left:3px solid var(--accent2)}
+.block-saber .block-lbl{color:var(--accent2)}
+.block-error{background:#2a1515;border:1px solid #5a2020;border-left:3px solid var(--danger)}
+.block-error .block-lbl{color:var(--danger)}
+.block-inspector{background:#2a2010;border:1px solid #5a4010;border-left:3px solid var(--accent3)}
+.block-inspector .block-lbl{color:var(--accent3)}
+.block-caso{background:#1a1a2a;border:1px solid #3a3a6a;border-left:3px solid #a78bfa}
+.block-caso .block-lbl{color:#a78bfa}
+
+/* ITEMS LIST */
+.items-list{margin-top:8px;display:grid;gap:6px}
+.item-row{display:flex;align-items:flex-start;gap:8px;font-size:13px}
+.item-dot{width:6px;height:6px;background:var(--accent2);border-radius:50%;margin-top:6px;flex-shrink:0}
+.item-dot.warn{background:var(--accent3)}
+.item-dot.danger{background:var(--danger)}
+
+/* TABLE SIMPLE */
+.simple-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.simple-table th{background:var(--surface2);color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.simple-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+.simple-table tr:last-child td{border-bottom:none}
+.td-hi{color:var(--accent2);font-weight:700}
+
+/* QUIZ */
+.quiz-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.quiz-num{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.quiz-q{font-size:15px;font-weight:600;margin-bottom:14px;line-height:1.5}
+.choices{display:grid;gap:8px;margin-bottom:12px}
+.choice-btn{background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;text-align:left;transition:all .18s;font-weight:500;width:100%}
+.choice-btn:hover:not(:disabled){border-color:var(--accent);background:#1e2a40}
+.choice-btn.correct{border-color:var(--accent4)!important;background:#0f2a18!important;color:var(--accent4)!important}
+.choice-btn.wrong{border-color:var(--danger)!important;background:#2a0f0f!important;color:var(--danger)!important}
+.choice-btn:disabled{cursor:default}
+.feedback-box{border-radius:var(--radius-sm);padding:11px 13px;font-size:12px;display:none;line-height:1.5;margin-bottom:10px}
+.feedback-box.ok{background:#0f2a18;border:1px solid var(--accent4);color:var(--accent4);display:block}
+.feedback-box.bad{background:#2a0f0f;border:1px solid var(--danger);color:var(--danger);display:block}
+.feedback-detail{color:var(--muted);font-size:11px;margin-top:5px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:13px 24px;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;width:100%}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.4;cursor:default;transform:none}
+.btn-success{background:linear-gradient(135deg,var(--accent2),#059669);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text)}
+
+/* SECTION TITLE */
+.sec-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* LESSON LIST */
+.lesson-list{display:grid;gap:8px}
+.lesson-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
+.lesson-item:hover{border-color:var(--accent);background:var(--surface2)}
+.lesson-item.done-item{border-color:rgba(16,185,129,.3)}
+.li-num{width:28px;height:28px;background:var(--surface2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0}
+.li-num.done{background:rgba(16,185,129,.15);color:var(--accent2)}
+.li-info{flex:1}
+.li-name{font-size:13px;font-weight:700;margin-bottom:1px}
+.li-sub{font-size:11px;color:var(--muted)}
+.li-check{color:var(--accent2);font-size:16px}
+
+/* GLOSARIO */
+.glosario-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px}
+.glosario-term{font-size:14px;font-weight:800;color:var(--accent2);margin-bottom:6px}
+.glosario-def{font-size:13px;color:var(--text);line-height:1.6;opacity:.85}
+
+/* CRÉDITOS */
+.cred-link{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;margin-bottom:8px;text-decoration:none;color:var(--text);transition:border-color .2s}
+.cred-link:hover{border-color:var(--accent)}
+.cred-link-icon{font-size:20px;flex-shrink:0}
+.cred-link-info{flex:1}
+.cred-link-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.cred-link-url{font-size:11px;color:var(--muted)}
+
+/* EVAL */
+.eval-card{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+.eval-card:hover{border-color:var(--accent)}
+.eval-icon{font-size:32px;margin-bottom:8px}
+.eval-title{font-size:16px;font-weight:800;margin-bottom:4px}
+.eval-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.eval-meta{display:flex;gap:12px;margin-top:10px;font-size:11px;color:var(--accent3);font-weight:600}
+
+/* RESULT */
+.result-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;text-align:center}
+.result-score{font-size:52px;font-weight:900;line-height:1;margin-bottom:6px}
+.result-label{font-size:13px;color:var(--muted);margin-bottom:16px}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
+.result-item{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px}
+.result-item-val{font-size:18px;font-weight:800;color:var(--accent2)}
+.result-item-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* TAG */
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-blue{background:rgba(37,99,235,.15);color:var(--accent);border:1px solid rgba(37,99,235,.3)}
+.tag-green{background:rgba(16,185,129,.15);color:var(--accent2);border:1px solid rgba(16,185,129,.3)}
+.tag-amber{background:rgba(245,158,11,.15);color:var(--accent3);border:1px solid rgba(245,158,11,.3)}
+.tag-red{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.3)}
+
+/* DIAGRAMA */
+.ruta-flow{display:flex;flex-direction:column;gap:0;align-items:center;margin:12px 0}
+.ruta-step{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 20px;text-align:center;width:100%;max-width:280px;position:relative}
+.ruta-step.active-step{border-color:var(--accent);background:rgba(37,99,235,.1)}
+.ruta-step .step-num{font-size:10px;color:var(--accent);font-weight:700;margin-bottom:2px}
+.ruta-step .step-name{font-size:13px;font-weight:700}
+.ruta-step .step-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.ruta-arrow{color:var(--muted);font-size:16px;margin:4px 0;text-align:center}
+
+/* NOTIFICATION */
+.notif{position:fixed;bottom:24px;right:20px;background:var(--surface);border:1px solid var(--accent2);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;font-weight:600;color:var(--accent2);z-index:999;transform:translateY(80px);transition:transform .3s;max-width:300px}
+.notif.show{transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:480px){
+  .dash-stats{grid-template-columns:1fr 1fr}
+  .result-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">Ruta SEC <span>Clase 3 · Gas</span></div>
+    <div class="hdr-right">
+      <div class="xp-badge">⚡ <span id="xp-display">0</span> XP</div>
+      <div class="streak-badge">🔥 <span id="streak-display">0</span> días</div>
+    </div>
+  </div>
+</div>
+<div class="nav" id="main-nav">
+  <button class="nav-btn active" onclick="goScreen('s-dash')">🏠 Inicio</button>
+  <button class="nav-btn" id="nav-normativa" onclick="goScreen('s-normativa')">📋 Normativa</button>
+  <button class="nav-btn" id="nav-materiales" onclick="goScreen('s-materiales')">🔧 Materiales</button>
+  <button class="nav-btn" id="nav-ventilacion" onclick="goScreen('s-ventilacion')">💨 Ventilación</button>
+  <button class="nav-btn" id="nav-hermeticidad" onclick="goScreen('s-hermeticidad')">🔍 Hermeticidad</button>
+  <button class="nav-btn" id="nav-seguridad" onclick="goScreen('s-seguridad')">🛡️ Seguridad</button>
+  <button class="nav-btn" id="nav-calculos" onclick="goScreen('s-calculos')">📐 Cálculos</button>
+  <button class="nav-btn" id="nav-artefactos" onclick="goScreen('s-artefactos')">🔥 Artefactos</button>
+  <button class="nav-btn" id="nav-evaluacion" onclick="goScreen('s-evaluacion')">📝 Evaluación</button>
+  <button class="nav-btn" id="nav-glosario" onclick="goScreen('s-glosario')">📚 Glosario</button>
+  <button class="nav-btn" id="nav-creditos" onclick="goScreen('s-creditos')">🌐 Créditos</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: DASHBOARD
+══════════════════════════════════════ -->
+<div class="main">
+<div class="screen active" id="s-dash">
+
+  <div class="dash-hero">
+    <div class="dash-greeting">Bienvenido a tu plataforma de preparación</div>
+    <div class="dash-name">Ruta SEC · Clase 3 🔧</div>
+    <div class="dash-stats">
+      <div class="stat-box">
+        <div class="stat-val" id="d-comp">0/8</div>
+        <div class="stat-lbl">Competencias</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="d-hrs">0h</div>
+        <div class="stat-lbl">Tiempo estudiado</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="d-streak">0</div>
+        <div class="stat-lbl">Racha (días)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="d-exam">—</div>
+        <div class="stat-lbl">Último examen</div>
+      </div>
+    </div>
+    <div class="dash-prob">
+      <div>
+        <div class="prob-lbl">Probabilidad estimada de aprobación</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Basada en tu progreso actual</div>
+      </div>
+      <div class="prob-val" id="d-prob">0%</div>
+    </div>
+  </div>
+
+  <div class="sec-title">Tu progreso por competencia</div>
+  <div class="comp-grid" id="comp-grid">
+    <!-- generado por JS -->
+  </div>
+
+  <div style="margin-top:20px" class="sec-title">Evaluaciones</div>
+  <div class="eval-card" onclick="startDiagnostico()">
+    <div class="eval-icon">🩺</div>
+    <div class="eval-title">Diagnóstico Inicial</div>
+    <div class="eval-desc">Identifica tus fortalezas y debilidades antes de comenzar. Recibe una ruta personalizada de estudio.</div>
+    <div class="eval-meta"><span>25 preguntas</span><span>·</span><span>Sin límite de tiempo</span><span>·</span><span id="diag-estado">No realizado</span></div>
+  </div>
+  <div class="eval-card" onclick="startIntermedio()">
+    <div class="eval-icon">📊</div>
+    <div class="eval-title">Evaluación Intermedia</div>
+    <div class="eval-desc">Mide tu progreso después de estudiar los módulos. 50 preguntas con retroalimentación inmediata.</div>
+    <div class="eval-meta"><span>50 preguntas</span><span>·</span><span>Sin límite de tiempo</span><span>·</span><span id="inter-estado">No realizado</span></div>
+  </div>
+  <div class="eval-card" onclick="startSimulacion()">
+    <div class="eval-icon">🏆</div>
+    <div class="eval-title">Simulación Final</div>
+    <div class="eval-desc">Simula la evaluación oficial ChileValora. 100 preguntas sin ayuda con cronómetro de 90 minutos.</div>
+    <div class="eval-meta"><span>100 preguntas</span><span>·</span><span>90 minutos</span><span>·</span><span id="sim-estado">No realizado</span></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: NORMATIVA
+══════════════════════════════════════ -->
+<div class="screen" id="s-normativa">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div class="mod-header">
+    <div class="mod-icon">📋</div>
+    <div class="mod-tag">Competencia 1</div>
+    <div class="mod-title">Normativa · DS N°66</div>
+    <div class="mod-desc">Entiende el marco legal que regula las instalaciones de gas en Chile. Base obligatoria para la evaluación SEC.</div>
+    <div class="mod-meta"><span>4 lecciones</span><span>·</span><span>~20 min</span></div>
+  </div>
+
+  <div class="sec-title">Contenido</div>
+  <div class="lesson-list" id="ll-normativa"></div>
+
+  <div id="normativa-content" style="display:none;margin-top:16px">
+
+    <div class="block block-objetivo">
+      <div class="block-lbl">🎯 Objetivo</div>
+      <div class="block-body">Al finalizar esta competencia serás capaz de interpretar el DS N°66, identificar los tipos de licencias SEC, y conocer las responsabilidades del instalador habilitado.</div>
+    </div>
+
+    <div class="sec-title" style="margin-top:16px">Lección 1 — ¿Qué es el DS N°66?</div>
+    <div class="block block-saber">
+      <div class="block-lbl">📖 Debes saber</div>
+      <div class="block-body">
+        El <strong>Decreto Supremo N°66</strong> del Ministerio de Economía es el reglamento que regula todas las <strong>Instalaciones Interiores y Medidores de Gas</strong> en Chile.<br><br>
+        Fue creado para garantizar la seguridad de las instalaciones domiciliarias, comerciales e industriales que usan gas natural o GLP.<br><br>
+        Como instalador Clase 3, estás legalmente obligado a cumplirlo en cada trabajo que realices. El incumplimiento puede resultar en multas, accidentes y revocación de tu licencia.
+        <div class="items-list" style="margin-top:10px">
+          <div class="item-row"><div class="item-dot"></div><span>Regula gas natural, GLP y otros gases combustibles</span></div>
+          <div class="item-row"><div class="item-dot"></div><span>Define estándares técnicos mínimos de seguridad</span></div>
+          <div class="item-row"><div class="item-dot"></div><span>Establece responsabilidades del instalador habilitado</span></div>
+          <div class="item-row"><div class="item-dot"></div><span>Es complementado por las NCh (Normas Chilenas) de gas</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">Lección 2 — Tipos de licencias SEC</div>
+    <div class="card">
+      <table class="simple-table">
+        <thead><tr><th>Clase</th><th>Alcance</th><th>UA máximo</th></tr></thead>
+        <tbody>
+          <tr><td>Clase 1</td><td>Domiciliarias simples</td><td class="td-hi">Hasta 20 UA</td></tr>
+          <tr><td>Clase 2</td><td>Domiciliarias y comerciales</td><td class="td-hi">Hasta 50 UA</td></tr>
+          <tr><td><strong>Clase 3 ← TÚ</strong></td><td>Domiciliarias, comerciales, industria menor</td><td class="td-hi">Hasta 200 UA</td></tr>
+          <tr><td>Clase 4</td><td>Grandes instalaciones industriales</td><td class="td-hi">Sin límite</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block block-caso">
+      <div class="block-lbl">🏗️ Caso real</div>
+      <div class="block-body">
+        Un edificio de 8 pisos con 3 calefones por departamento te contrata para revisar las instalaciones. El primer paso que debes hacer es calcular el total de UA del edificio.<br><br>
+        Con Clase 3 puedes operar instalaciones hasta 200 UA. Si el edificio supera ese límite, necesitas contratar a un instalador Clase 4. Saber esto antes de comenzar te evita problemas legales.
+      </div>
+    </div>
+
+    <div class="sec-title">Lección 3 — Ruta hacia la Licencia</div>
+    <div class="ruta-flow">
+      <div class="ruta-step"><div class="step-num">Paso 1</div><div class="step-name">Experiencia en obra</div><div class="step-desc">Mínimo acreditado por empleadores</div></div>
+      <div class="ruta-arrow">↓</div>
+      <div class="ruta-step"><div class="step-num">Paso 2</div><div class="step-name">Preparación normativa</div><div class="step-desc">DS66, materiales, cálculos, seguridad</div></div>
+      <div class="ruta-arrow">↓</div>
+      <div class="ruta-step active-step"><div class="step-num">Paso 3 — Estás aquí</div><div class="step-name">Evaluación ChileValora</div><div class="step-desc">Teórica + práctica en terreno</div></div>
+      <div class="ruta-arrow">↓</div>
+      <div class="ruta-step"><div class="step-num">Paso 4</div><div class="step-name">Certificado de Competencias</div><div class="step-desc">Emitido por organismo acreditado</div></div>
+      <div class="ruta-arrow">↓</div>
+      <div class="ruta-step"><div class="step-num">Paso 5</div><div class="step-name">Solicitud Licencia SEC</div><div class="step-desc">Presentación a superintendencia</div></div>
+      <div class="ruta-arrow">↓</div>
+      <div class="ruta-step"><div class="step-num">Paso 6</div><div class="step-name">✅ Ejercicio Profesional</div><div class="step-desc">Instalaciones hasta 200 UA</div></div>
+    </div>
+
+    <div class="block block-error">
+      <div class="block-lbl">⚠️ Error frecuente</div>
+      <div class="block-body">
+        Muchos confunden el DS N°66 con la NCh (Norma Chilena). Son documentos distintos: el DS66 es el <strong>reglamento con fuerza de ley</strong> que debes cumplir obligatoriamente. Las NCh son normas técnicas que lo complementan.<br><br>
+        En el examen pueden preguntarte por ambos — no los mezcles.
+      </div>
+    </div>
+
+    <div class="block block-inspector">
+      <div class="block-lbl">💼 Consejo del Inspector</div>
+      <div class="block-body">
+        "Los instaladores que más fallan en la evaluación son los que conocen el trabajo práctico pero no saben citarlo con el artículo correcto del DS66. No necesitas memorizarlo de principio a fin — necesitas saber qué dice sobre materiales, ventilación y hermeticidad."
+      </div>
+    </div>
+
+    <div class="sec-title">Mini evaluación — Normativa</div>
+    <div id="quiz-normativa"></div>
+    <button class="btn btn-primary" id="btn-check-normativa" onclick="checkQuiz('normativa')" disabled>Verificar respuestas</button>
+    <div id="result-normativa" style="display:none;margin-top:14px"></div>
+    <div style="margin-top:14px">
+      <button class="btn btn-success" onclick="markDone('normativa');goScreen('s-dash')">✅ Marcar como completada</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: MATERIALES
+══════════════════════════════════════ -->
+<div class="screen" id="s-materiales">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div class="mod-header">
+    <div class="mod-icon">🔧</div>
+    <div class="mod-tag">Competencia 2</div>
+    <div class="mod-title">Materiales</div>
+    <div class="mod-desc">Identifica los materiales permitidos, sus usos correctos y las restricciones del DS66.</div>
+    <div class="mod-meta"><span>3 lecciones</span><span>·</span><span>~15 min</span></div>
+  </div>
+
+  <div class="block block-objetivo">
+    <div class="block-lbl">🎯 Objetivo</div>
+    <div class="block-body">Seleccionar correctamente el tipo de tubería, accesorio y válvula para cada tipo de instalación, cumpliendo las normas del DS66.</div>
+  </div>
+
+  <div class="sec-title">Tuberías permitidas</div>
+  <div class="card">
+    <table class="simple-table">
+      <thead><tr><th>Material</th><th>Uso permitido</th><th>Restricción</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Cobre</strong></td><td>Interior y exterior</td><td class="td-hi">El más usado en domiciliaria</td></tr>
+        <tr><td><strong>Acero negro</strong></td><td>Interior, mayor diámetro</td><td style="color:var(--muted)">Requiere protección anticorrosión</td></tr>
+        <tr><td><strong>Polietileno (PE)</strong></td><td><span class="tag tag-red">SOLO ENTERRADO</span></td><td style="color:var(--danger)">PROHIBIDO en interior</td></tr>
+        <tr><td><strong>Acero galvanizado</strong></td><td>Exterior / industrial</td><td style="color:var(--muted)">Verificar compatibilidad</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="block block-error">
+    <div class="block-lbl">⚠️ Error más frecuente en el examen</div>
+    <div class="block-body">
+      Usar <strong>polietileno (PE) en instalaciones interiores</strong>. Este material está <strong>estrictamente prohibido</strong> dentro de recintos. Solo se autoriza para instalaciones enterradas o subterráneas.<br><br>
+      Si en el examen te muestran un plano con PE dentro de una cocina → esa instalación es incorrecta.
+    </div>
+  </div>
+
+  <div class="sec-title">Válvulas y accesorios</div>
+  <div class="block block-saber">
+    <div class="block-lbl">📖 Debes saber</div>
+    <div class="block-body">
+      <strong>Válvulas de corte obligatorias:</strong>
+      <div class="items-list" style="margin-top:8px">
+        <div class="item-row"><div class="item-dot"></div><span><strong>Válvula general:</strong> en la entrada de la instalación, antes del medidor</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>Válvula de ramal:</strong> una por cada zona o piso</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>Válvula de artefacto:</strong> obligatoria ANTES de cada artefacto</span></div>
+        <div class="item-row"><div class="item-dot warn"></div><span><strong>Unión dieléctrica:</strong> cuando se juntan materiales de distinto tipo (ej: cobre con acero)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block block-caso">
+    <div class="block-lbl">🏗️ Caso real</div>
+    <div class="block-body">
+      Llegas a una instalación existente y encuentras tubería de polietileno llegando desde la calle hasta la cocina, pasando por el interior del muro.<br><br>
+      <strong>¿Qué debes hacer?</strong> Informar la no-conformidad y reemplazar el tramo interior por tubería de cobre o acero negro. El PE puede seguir en el tramo enterrado exterior, pero debe hacer transición a material permitido antes de ingresar al recinto.
+    </div>
+  </div>
+
+  <div class="block block-inspector">
+    <div class="block-lbl">💼 Consejo del Inspector</div>
+    <div class="block-body">
+      "Fíjate siempre en el color de la tubería. En Chile, la tubería PE para gas generalmente es amarilla. Si ves tubería amarilla dentro de un recinto — es una falla inmediata. No importa cuántos años lleve así."
+    </div>
+  </div>
+
+  <div class="sec-title">Mini evaluación — Materiales</div>
+  <div id="quiz-materiales"></div>
+  <button class="btn btn-primary" id="btn-check-materiales" onclick="checkQuiz('materiales')" disabled>Verificar respuestas</button>
+  <div id="result-materiales" style="display:none;margin-top:14px"></div>
+  <div style="margin-top:14px">
+    <button class="btn btn-success" onclick="markDone('materiales');goScreen('s-dash')">✅ Marcar como completada</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: VENTILACIÓN
+══════════════════════════════════════ -->
+<div class="screen" id="s-ventilacion">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div class="mod-header">
+    <div class="mod-icon">💨</div>
+    <div class="mod-tag">Competencia 3</div>
+    <div class="mod-title">Ventilación</div>
+    <div class="mod-desc">La ventilación incorrecta es la principal causa de accidentes por gas. Domina este tema antes que cualquier otro.</div>
+    <div class="mod-meta"><span>3 lecciones</span><span>·</span><span>~20 min</span></div>
+  </div>
+
+  <div class="block block-objetivo">
+    <div class="block-lbl">🎯 Objetivo</div>
+    <div class="block-body">Calcular la ventilación mínima requerida para cada artefacto, identificar cuando se requiere ducto de evacuación y detectar instalaciones con ventilación insuficiente.</div>
+  </div>
+
+  <div class="sec-title">¿Por qué es crítica?</div>
+  <div class="block block-saber">
+    <div class="block-lbl">📖 Debes saber</div>
+    <div class="block-body">
+      Los artefactos a gas necesitan oxígeno para combustión. Sin ventilación adecuada ocurre lo siguiente:
+      <div class="items-list" style="margin-top:8px">
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>Monóxido de carbono (CO):</strong> gas tóxico, incoloro, inodoro — la causa principal de muertes por gas</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>Apagado del artefacto:</strong> sin O₂ suficiente la llama se apaga y el gas sigue fluyendo</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>Riesgo de explosión:</strong> acumulación de gas sin ignición</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">Requisitos mínimos DS66</div>
+  <div class="card">
+    <table class="simple-table">
+      <thead><tr><th>Elemento</th><th>Tamaño mínimo</th><th>Ubicación</th></tr></thead>
+      <tbody>
+        <tr><td>Rejilla de entrada (aire)</td><td class="td-hi">50 cm² por cada 1.000 kcal/h</td><td>Parte baja del muro</td></tr>
+        <tr><td>Rejilla de salida (gases)</td><td class="td-hi">Igual que entrada</td><td>Parte alta, muro opuesto</td></tr>
+        <tr><td>Ducto evacuación calefón</td><td class="td-hi">Obligatorio siempre</td><td>Sale al exterior</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-title">Ejemplo de cálculo</div>
+  <div class="card">
+    <div class="card-label">🔢 Ejercicio práctico</div>
+    <div style="font-size:13px;line-height:1.7">
+      <strong>Datos:</strong> Cocina de 4 quemadores con potencia total de <strong>20.000 kcal/h</strong><br><br>
+      <strong>Fórmula:</strong> Área rejilla = (Potencia ÷ 1.000) × 50 cm²<br><br>
+      <strong>Cálculo:</strong> (20.000 ÷ 1.000) × 50 = <strong style="color:var(--accent2)">1.000 cm²</strong><br><br>
+      Necesitas una rejilla de entrada de mínimo <strong>1.000 cm²</strong> (equivalente a ~32 × 32 cm)
+    </div>
+  </div>
+
+  <div class="block block-error">
+    <div class="block-lbl">⚠️ Error más frecuente — PROHIBICIÓN CRÍTICA</div>
+    <div class="block-body">
+      <strong>Instalar un calefón en un baño sin ducto de evacuación al exterior.</strong><br><br>
+      Esto está <strong>PROHIBIDO por el DS66</strong>. Los calefones siempre requieren ducto de evacuación independiente del tamaño del baño o si tiene ventana. El ducto debe llegar hasta el exterior del edificio.<br><br>
+      Este es uno de los puntos más evaluados en la certificación ChileValora.
+    </div>
+  </div>
+
+  <div class="block block-caso">
+    <div class="block-lbl">🏗️ Caso real</div>
+    <div class="block-body">
+      Un cliente quiere instalar un calefón en su baño de 4 m². Dice que tiene una ventana al patio interior y que "con eso basta".<br><br>
+      <strong>Tu respuesta correcta:</strong> Explicar que la ventana no reemplaza al ducto de evacuación. El calefón genera gases de combustión que deben salir directamente al exterior mediante un ducto específico. Propones instalar el calefón en un recinto exterior (pasillo, terraza cubierta) con ducto al exterior, o usar un calefón de cámara estanca (tiraje forzado) con salida directa al muro exterior.
+    </div>
+  </div>
+
+  <div class="block block-inspector">
+    <div class="block-lbl">💼 Consejo del Inspector</div>
+    <div class="block-body">
+      "La ventilación es donde más infracciones encontramos. La gente instala el calefón en el baño sin ducto porque el cliente lo pide. Ese error puede costarle la vida a una familia y a ti la licencia. Nunca cedas en ventilación."
+    </div>
+  </div>
+
+  <div class="sec-title">Mini evaluación — Ventilación</div>
+  <div id="quiz-ventilacion"></div>
+  <button class="btn btn-primary" id="btn-check-ventilacion" onclick="checkQuiz('ventilacion')" disabled>Verificar respuestas</button>
+  <div id="result-ventilacion" style="display:none;margin-top:14px"></div>
+  <div style="margin-top:14px">
+    <button class="btn btn-success" onclick="markDone('ventilacion');goScreen('s-dash')">✅ Marcar como completada</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: HERMETICIDAD
+══════════════════════════════════════ -->
+<div class="screen" id="s-hermeticidad">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div class="mod-header">
+    <div class="mod-icon">🔍</div>
+    <div class="mod-tag">Competencia 4</div>
+    <div class="mod-title">Hermeticidad</div>
+    <div class="mod-desc">La prueba de hermeticidad certifica que tu instalación no tiene fugas. Sin ella, no hay entrega de obra.</div>
+    <div class="mod-meta"><span>3 lecciones</span><span>·</span><span>~20 min</span></div>
+  </div>
+
+  <div class="block block-objetivo">
+    <div class="block-lbl">🎯 Objetivo</div>
+    <div class="block-body">Ejecutar correctamente la prueba de hermeticidad, identificar los instrumentos adecuados, conocer las presiones de prueba según DS66 y determinar si una instalación aprueba o no.</div>
+  </div>
+
+  <div class="sec-title">¿Qué es la prueba de hermeticidad?</div>
+  <div class="block block-saber">
+    <div class="block-lbl">📖 Debes saber</div>
+    <div class="block-body">
+      Es la verificación de que la instalación no tiene fugas. Se realiza <strong>antes de conectar artefactos</strong> y antes de la puesta en servicio.<br><br>
+      <strong>Procedimiento paso a paso:</strong>
+      <div class="items-list" style="margin-top:8px">
+        <div class="item-row"><div class="item-dot"></div><span><strong>1.</strong> Cerrar todos los artefactos y válvulas de servicio</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>2.</strong> Conectar manómetro a la tubería</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>3.</strong> Presurizar con aire o gas inerte hasta la presión de prueba</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>4.</strong> Esperar el tiempo mínimo establecido</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>5.</strong> Verificar que la presión no haya bajado</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">Presiones de prueba — DS66</div>
+  <div class="card">
+    <table class="simple-table">
+      <thead><tr><th>Tipo instalación</th><th>Presión de prueba</th><th>Tiempo mínimo</th></tr></thead>
+      <tbody>
+        <tr><td>Baja presión (domiciliaria)</td><td class="td-hi">300 mm.c.a. mínimo</td><td class="td-hi">30 minutos</td></tr>
+        <tr><td>Media presión</td><td class="td-hi">1.5× presión de trabajo</td><td class="td-hi">30 minutos</td></tr>
+        <tr><td>Instalación nueva</td><td class="td-hi">Presión doble de trabajo</td><td class="td-hi">30 minutos</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:var(--muted);margin-top:10px">mm.c.a. = milímetros de columna de agua</div>
+  </div>
+
+  <div class="sec-title">Instrumentos</div>
+  <div class="block block-saber">
+    <div class="block-lbl">🔧 Herramientas de la prueba</div>
+    <div class="block-body">
+      <div class="items-list">
+        <div class="item-row"><div class="item-dot"></div><span><strong>Manómetro de agua (columna):</strong> para baja presión, el más común</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>Manómetro de membrana:</strong> más preciso, para media y alta presión</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>Detector electrónico:</strong> para localizar la fuga una vez detectada</span></div>
+        <div class="item-row"><div class="item-dot warn"></div><span><strong>Agua jabonosa:</strong> método auxiliar para localizar fugas en uniones</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block block-error">
+    <div class="block-lbl">⚠️ Error frecuente</div>
+    <div class="block-body">
+      Realizar la prueba con los artefactos conectados a la red. Los artefactos deben estar <strong>desconectados</strong> de la tubería durante la prueba. Si la prueba se hace con ellos conectados, los internos del artefacto pueden dañarse con la presión de prueba, y además el resultado no es confiable.
+    </div>
+  </div>
+
+  <div class="block block-caso">
+    <div class="block-lbl">🏗️ Caso real</div>
+    <div class="block-body">
+      Presurizas la instalación a 300 mm.c.a. y a los 20 minutos el manómetro marca 285 mm.c.a.<br><br>
+      <strong>¿Aprueba o no?</strong> NO aprueba. Cualquier caída de presión durante los 30 minutos indica fuga. Debes localizar la fuga (agua jabonosa en uniones), repararla y repetir la prueba desde cero.
+    </div>
+  </div>
+
+  <div class="block block-inspector">
+    <div class="block-lbl">💼 Consejo del Inspector</div>
+    <div class="block-body">
+      "La hermeticidad no es negociable. Un instalador que entrega obra sin prueba de hermeticidad está poniendo en riesgo vidas. En la evaluación te preguntarán la presión y el tiempo — apréndetelos de memoria."
+    </div>
+  </div>
+
+  <div class="sec-title">Mini evaluación — Hermeticidad</div>
+  <div id="quiz-hermeticidad"></div>
+  <button class="btn btn-primary" id="btn-check-hermeticidad" onclick="checkQuiz('hermeticidad')" disabled>Verificar respuestas</button>
+  <div id="result-hermeticidad" style="display:none;margin-top:14px"></div>
+  <div style="margin-top:14px">
+    <button class="btn btn-success" onclick="markDone('hermeticidad');goScreen('s-dash')">✅ Marcar como completada</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: SEGURIDAD
+══════════════════════════════════════ -->
+<div class="screen" id="s-seguridad">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div class="mod-header">
+    <div class="mod-icon">🛡️</div>
+    <div class="mod-tag">Competencia 5</div>
+    <div class="mod-title">Seguridad</div>
+    <div class="mod-desc">Válvulas, señalización, distancias y protocolos de emergencia. Lo que el inspector busca primero.</div>
+    <div class="mod-meta"><span>3 lecciones</span><span>·</span><span>~15 min</span></div>
+  </div>
+
+  <div class="block block-objetivo">
+    <div class="block-lbl">🎯 Objetivo</div>
+    <div class="block-body">Instalar correctamente las válvulas de corte, respetar distancias de seguridad, aplicar señalización y conocer el protocolo de emergencia ante fuga de gas.</div>
+  </div>
+
+  <div class="sec-title">Válvulas de corte</div>
+  <div class="block block-saber">
+    <div class="block-lbl">📖 Instalación obligatoria</div>
+    <div class="block-body">
+      <div class="items-list">
+        <div class="item-row"><div class="item-dot"></div><span><strong>Válvula general:</strong> en la entrada de la instalación, accesible siempre</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>Válvula de ramal:</strong> una por cada zona, piso o uso (cocina, calefacción)</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>Válvula de artefacto:</strong> OBLIGATORIA antes de CADA artefacto, sin excepción</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">Distancias de seguridad</div>
+  <div class="card">
+    <table class="simple-table">
+      <thead><tr><th>Situación</th><th>Distancia mínima</th></tr></thead>
+      <tbody>
+        <tr><td>Tubería gas vs tubería eléctrica</td><td class="td-hi">30 cm</td></tr>
+        <tr><td>Tubería gas vs fuente de calor</td><td class="td-hi">15 cm</td></tr>
+        <tr><td>Paso de tubería por muro</td><td class="td-hi">Con vaina protectora</td></tr>
+        <tr><td>Artefacto vs material combustible</td><td class="td-hi">Según ficha del fabricante</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-title">Protocolo de emergencia por fuga</div>
+  <div class="block block-error">
+    <div class="block-lbl">🚨 Protocolo obligatorio — en orden</div>
+    <div class="block-body">
+      <div class="items-list">
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>1.</strong> Cerrar inmediatamente la válvula de corte general</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>2.</strong> Ventilar el recinto: abrir todas las ventanas y puertas</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>3.</strong> NO encender ni apagar ningún interruptor eléctrico</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>4.</strong> NO usar el teléfono dentro del recinto</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>5.</strong> Evacuar a las personas y llamar a la distribuidora desde afuera</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span><strong>6.</strong> No reingresar hasta que el instalador o distribuidora lo autorice</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block block-inspector">
+    <div class="block-lbl">💼 Consejo del Inspector</div>
+    <div class="block-body">
+      "Lo primero que reviso cuando llego a una instalación es si hay válvula de artefacto en cada equipo y si la válvula general es accesible. Si no la encuentro en 30 segundos, ya hay una observación."
+    </div>
+  </div>
+
+  <div class="sec-title">Mini evaluación — Seguridad</div>
+  <div id="quiz-seguridad"></div>
+  <button class="btn btn-primary" id="btn-check-seguridad" onclick="checkQuiz('seguridad')" disabled>Verificar respuestas</button>
+  <div id="result-seguridad" style="display:none;margin-top:14px"></div>
+  <div style="margin-top:14px">
+    <button class="btn btn-success" onclick="markDone('seguridad');goScreen('s-dash')">✅ Marcar como completada</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: CÁLCULOS
+══════════════════════════════════════ -->
+<div class="screen" id="s-calculos">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div class="mod-header">
+    <div class="mod-icon">📐</div>
+    <div class="mod-tag">Competencia 6</div>
+    <div class="mod-title">Cálculos</div>
+    <div class="mod-desc">UA, potencias, diámetros de tubería. Los cálculos que el inspector puede pedirte que justifiques en terreno.</div>
+    <div class="mod-meta"><span>3 lecciones</span><span>·</span><span>~25 min</span></div>
+  </div>
+
+  <div class="block block-objetivo">
+    <div class="block-lbl">🎯 Objetivo</div>
+    <div class="block-body">Calcular el total de UA de una instalación, seleccionar el diámetro de tubería correcto y estimar el consumo de gas de los artefactos.</div>
+  </div>
+
+  <div class="sec-title">Unidades de Artefacto (UA)</div>
+  <div class="block block-saber">
+    <div class="block-lbl">📖 Qué son las UA</div>
+    <div class="block-body">
+      Las <strong>Unidades de Artefacto (UA)</strong> son una medida estandarizada del consumo de gas de cada equipo. Se usan para determinar el diámetro de la tubería necesaria.
+    </div>
+  </div>
+  <div class="card">
+    <table class="simple-table">
+      <thead><tr><th>Artefacto</th><th>UA</th><th>Potencia típica</th></tr></thead>
+      <tbody>
+        <tr><td>Cocina / Horno</td><td class="td-hi">1 UA</td><td>~18.000 kcal/h</td></tr>
+        <tr><td>Calefón instantáneo (10–14 L)</td><td class="td-hi">2 UA</td><td>~30.000–42.000 kcal/h</td></tr>
+        <tr><td>Calefón alto rendimiento</td><td class="td-hi">3 UA</td><td>~50.000 kcal/h</td></tr>
+        <tr><td>Calefactor ambiente</td><td class="td-hi">1 UA por 6.000 kcal/h</td><td>Variable</td></tr>
+        <tr><td>Caldera calefacción central</td><td class="td-hi">6–12 UA</td><td>>60.000 kcal/h</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-title">Selección de diámetro</div>
+  <div class="card">
+    <div class="card-label">Tabla simplificada — Gas natural, baja presión</div>
+    <table class="simple-table">
+      <thead><tr><th>UA total</th><th>Diámetro mínimo</th></tr></thead>
+      <tbody>
+        <tr><td>Hasta 5 UA</td><td class="td-hi">3/4" (20 mm)</td></tr>
+        <tr><td>5 – 15 UA</td><td class="td-hi">1" (25 mm)</td></tr>
+        <tr><td>15 – 30 UA</td><td class="td-hi">1¼" (32 mm)</td></tr>
+        <tr><td>30 – 60 UA</td><td class="td-hi">1½" (40 mm)</td></tr>
+        <tr><td>Más de 60 UA</td><td class="td-hi">2" (50 mm) o más</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-title">Ejemplo resuelto</div>
+  <div class="card">
+    <div class="card-label">🔢 Caso: Departamento estándar</div>
+    <div style="font-size:13px;line-height:1.8">
+      • 1 cocina 4 quemadores = <strong>1 UA</strong><br>
+      • 1 calefón 14 L = <strong>2 UA</strong><br>
+      • 1 calefactor 12.000 kcal/h = <strong>2 UA</strong><br>
+      <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px">
+        <strong>Total = 5 UA</strong><br>
+        <strong style="color:var(--accent2)">→ Diámetro mínimo: 3/4" (20 mm)</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="block block-inspector">
+    <div class="block-lbl">💼 Consejo del Inspector</div>
+    <div class="block-body">
+      "En terreno te pueden pedir que calcules el UA de una instalación y justifiques el diámetro elegido. Lleva siempre la tabla de UA y la tabla de diámetros. No las memorices — entiende cómo usarlas."
+    </div>
+  </div>
+
+  <div class="sec-title">Mini evaluación — Cálculos</div>
+  <div id="quiz-calculos"></div>
+  <button class="btn btn-primary" id="btn-check-calculos" onclick="checkQuiz('calculos')" disabled>Verificar respuestas</button>
+  <div id="result-calculos" style="display:none;margin-top:14px"></div>
+  <div style="margin-top:14px">
+    <button class="btn btn-success" onclick="markDone('calculos');goScreen('s-dash')">✅ Marcar como completada</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: ARTEFACTOS
+══════════════════════════════════════ -->
+<div class="screen" id="s-artefactos">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div class="mod-header">
+    <div class="mod-icon">🔥</div>
+    <div class="mod-tag">Competencia 7</div>
+    <div class="mod-title">Artefactos a Gas</div>
+    <div class="mod-desc">Tipos, restricciones de ubicación, requisitos de evacuación y conexiones obligatorias para cada artefacto.</div>
+    <div class="mod-meta"><span>3 lecciones</span><span>·</span><span>~20 min</span></div>
+  </div>
+
+  <div class="sec-title">Tipos y requisitos</div>
+  <div class="card">
+    <table class="simple-table">
+      <thead><tr><th>Artefacto</th><th>Ducto evacuación</th><th>Lugar prohibido</th></tr></thead>
+      <tbody>
+        <tr><td>Calefón instantáneo</td><td class="td-hi">SIEMPRE obligatorio</td><td style="color:var(--danger)">Baños sin ventilación mecánica</td></tr>
+        <tr><td>Cocina / Horno</td><td style="color:var(--muted)">No obligatorio</td><td style="color:var(--muted)">Sin ventilación natural</td></tr>
+        <tr><td>Calefactor ambiente</td><td class="td-hi">Obligatorio (excepto catalítico)</td><td style="color:var(--danger)">Dormitorios sin ducto</td></tr>
+        <tr><td>Estufa portátil</td><td style="color:var(--muted)">No obligatorio</td><td style="color:var(--danger)">Dormitorios (riesgo CO)</td></tr>
+        <tr><td>Caldera calefacción</td><td class="td-hi">SIEMPRE obligatorio</td><td style="color:var(--danger)">Recintos sin ventilación</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="block block-saber">
+    <div class="block-lbl">📖 Tipos de tiraje</div>
+    <div class="block-body">
+      <div class="items-list">
+        <div class="item-row"><div class="item-dot"></div><span><strong>Tiraje natural:</strong> el calor genera corriente que sube el humo. Requiere ducto vertical.</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>Tiraje forzado:</strong> ventilador extrae los gases. Permite ducto horizontal (muy común en calefones modernos).</span></div>
+        <div class="item-row"><div class="item-dot warn"></div><span><strong>Cámara estanca:</strong> el artefacto toma el aire del exterior directamente. Mayor seguridad. Permite instalar en baños.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block block-error">
+    <div class="block-lbl">⚠️ Error crítico — Calefón en baño</div>
+    <div class="block-body">
+      El error más frecuente y más grave. Un calefón estándar (tiraje natural) en un baño <strong>sin ducto de evacuación al exterior</strong> puede provocar intoxicación mortal por CO.<br><br>
+      La única solución aceptada por el DS66 es:<br>
+      • <strong>Calefón de cámara estanca</strong> con salida al exterior, O<br>
+      • Calefón en recinto exterior (fuera del baño) con ducto de evacuación adecuado
+    </div>
+  </div>
+
+  <div class="block block-inspector">
+    <div class="block-lbl">💼 Consejo del Inspector</div>
+    <div class="block-body">
+      "Cuando llego a inspeccionar, lo primero es el calefón. ¿Tiene ducto? ¿El ducto sale al exterior? ¿El material es adecuado? Si el ducto termina en el cielo falso o en el patio interior — es falla."
+    </div>
+  </div>
+
+  <div class="sec-title">Mini evaluación — Artefactos</div>
+  <div id="quiz-artefactos"></div>
+  <button class="btn btn-primary" id="btn-check-artefactos" onclick="checkQuiz('artefactos')" disabled>Verificar respuestas</button>
+  <div id="result-artefactos" style="display:none;margin-top:14px"></div>
+  <div style="margin-top:14px">
+    <button class="btn btn-success" onclick="markDone('artefactos');goScreen('s-dash')">✅ Marcar como completada</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: INSPECCIÓN
+══════════════════════════════════════ -->
+<div class="screen" id="s-inspeccion">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div class="mod-header">
+    <div class="mod-icon">🏛️</div>
+    <div class="mod-tag">Competencia 8</div>
+    <div class="mod-title">Proceso de Certificación</div>
+    <div class="mod-desc">ChileValora, la evaluación oficial y lo que el inspector revisará en terreno.</div>
+    <div class="mod-meta"><span>3 lecciones</span><span>·</span><span>~20 min</span></div>
+  </div>
+
+  <div class="block block-objetivo">
+    <div class="block-lbl">🎯 Objetivo</div>
+    <div class="block-body">Conocer el proceso completo de evaluación ChileValora, saber qué documentación presentar y anticipar los puntos críticos que el evaluador revisará.</div>
+  </div>
+
+  <div class="sec-title">¿Qué evalúa ChileValora?</div>
+  <div class="block block-saber">
+    <div class="block-lbl">📖 Proceso de evaluación</div>
+    <div class="block-body">
+      ChileValora es el organismo del Estado que acredita competencias laborales. La evaluación consta de:
+      <div class="items-list" style="margin-top:8px">
+        <div class="item-row"><div class="item-dot"></div><span><strong>Evaluación teórica:</strong> conocimiento del DS66, normativa, cálculos, materiales</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>Evaluación práctica:</strong> demostración en terreno o en módulo de simulación</span></div>
+        <div class="item-row"><div class="item-dot"></div><span><strong>Portfolio de evidencias:</strong> acreditar experiencia laboral previa</span></div>
+        <div class="item-row"><div class="item-dot warn"></div><span><strong>Informe del evaluador:</strong> documento que respalda la competencia</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">Los 5 errores más frecuentes en la evaluación</div>
+  <div class="block block-error">
+    <div class="block-lbl">⚠️ Lo que más falla</div>
+    <div class="block-body">
+      <div class="items-list">
+        <div class="item-row"><div class="item-dot danger"></div><span>No saber la <strong>presión de prueba de hermeticidad</strong> (300 mm.c.a., 30 min)</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span>Confundir qué materiales están permitidos en interior</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span>No saber calcular la ventilación mínima requerida</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span>Desconocer los tipos de licencias y sus alcances en UA</span></div>
+        <div class="item-row"><div class="item-dot danger"></div><span>No identificar cuándo se requiere ducto de evacuación obligatorio</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block block-inspector">
+    <div class="block-lbl">💼 Consejo del evaluador</div>
+    <div class="block-body">
+      "No te prepares para memorizar artículos. Prepárate para resolver problemas reales. En terreno te voy a mostrar una instalación y te voy a preguntar qué está mal y cómo lo arreglarías. El que sabe el DS66 de memoria pero no sabe aplicarlo, no pasa."
+    </div>
+  </div>
+
+  <div class="sec-title">Mini evaluación — Inspección</div>
+  <div id="quiz-inspeccion"></div>
+  <button class="btn btn-primary" id="btn-check-inspeccion" onclick="checkQuiz('inspeccion')" disabled>Verificar respuestas</button>
+  <div id="result-inspeccion" style="display:none;margin-top:14px"></div>
+  <div style="margin-top:14px">
+    <button class="btn btn-success" onclick="markDone('inspeccion');goScreen('s-dash')">✅ Marcar como completada</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: EVALUACIÓN (HUB)
+══════════════════════════════════════ -->
+<div class="screen" id="s-evaluacion">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div style="font-size:22px;font-weight:900;margin-bottom:6px">Centro de Evaluación</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Mide tu nivel real y simula la evaluación oficial</div>
+
+  <div class="eval-card" onclick="startDiagnostico()">
+    <div class="eval-icon">🩺</div>
+    <div class="eval-title">Diagnóstico Inicial</div>
+    <div class="eval-desc">Identifica tus fortalezas y debilidades. Recibe ruta personalizada. Recomendado antes de comenzar el estudio.</div>
+    <div class="eval-meta"><span>25 preguntas</span><span>·</span><span>Todas las áreas</span><span>·</span><span id="diag-estado2">No realizado</span></div>
+  </div>
+
+  <div class="eval-card" onclick="startIntermedio()">
+    <div class="eval-icon">📊</div>
+    <div class="eval-title">Evaluación Intermedia</div>
+    <div class="eval-desc">Mide tu avance a mitad del estudio. Retroalimentación inmediata por área. Sin cronómetro.</div>
+    <div class="eval-meta"><span>50 preguntas</span><span>·</span><span>Sin tiempo</span><span>·</span><span id="inter-estado2">No realizado</span></div>
+  </div>
+
+  <div class="eval-card" onclick="startSimulacion()">
+    <div class="eval-icon">🏆</div>
+    <div class="eval-title">Simulación Final</div>
+    <div class="eval-desc">100 preguntas sin ayuda. Cronómetro de 90 minutos. Condiciones reales de la evaluación ChileValora.</div>
+    <div class="eval-meta"><span>100 preguntas</span><span>·</span><span>90 minutos</span><span>·</span><span id="sim-estado2">No realizado</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: DIAGNÓSTICO
+══════════════════════════════════════ -->
+<div class="screen" id="s-diagnostico">
+  <button class="back-btn" onclick="goScreen('s-evaluacion')">← Volver a evaluaciones</button>
+  <div style="font-size:20px;font-weight:900;margin-bottom:4px">🩺 Diagnóstico Inicial</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">25 preguntas · Todas las áreas · Sin límite de tiempo</div>
+  <div id="diag-quiz-container"></div>
+  <div id="diag-result" style="display:none"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: EVALUACIÓN INTERMEDIA
+══════════════════════════════════════ -->
+<div class="screen" id="s-intermedio">
+  <button class="back-btn" onclick="goScreen('s-evaluacion')">← Volver a evaluaciones</button>
+  <div style="font-size:20px;font-weight:900;margin-bottom:4px">📊 Evaluación Intermedia</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">50 preguntas · Todas las áreas · Sin límite de tiempo</div>
+  <div id="inter-quiz-container"></div>
+  <div id="inter-result" style="display:none"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: SIMULACIÓN FINAL
+══════════════════════════════════════ -->
+<div class="screen" id="s-simulacion">
+  <button class="back-btn" onclick="goScreen('s-evaluacion')">← Volver a evaluaciones</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div>
+      <div style="font-size:20px;font-weight:900">🏆 Simulación Final</div>
+      <div style="font-size:12px;color:var(--muted)">100 preguntas · Sin ayudas · Condiciones reales</div>
+    </div>
+    <div id="timer-box" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent3)">90:00</div>
+  </div>
+  <div id="sim-quiz-container"></div>
+  <div id="sim-result" style="display:none"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: GLOSARIO
+══════════════════════════════════════ -->
+<div class="screen" id="s-glosario">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div style="font-size:22px;font-weight:900;margin-bottom:4px">📚 Glosario Técnico</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Términos esenciales para la certificación SEC Clase 3 · Gas</div>
+
+  <div class="block block-objetivo" style="margin-bottom:16px">
+    <div class="block-lbl">ℹ️ Para qué sirve este glosario</div>
+    <div class="block-body">Si encuentras un término que no conoces en el estudio, búscalo aquí. También es útil como repaso rápido antes de la evaluación.</div>
+  </div>
+
+  <div id="glosario-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA: CRÉDITOS / WEBIBLIOGRAFÍA
+══════════════════════════════════════ -->
+<div class="screen" id="s-creditos">
+  <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
+  <div style="font-size:22px;font-weight:900;margin-bottom:4px">🌐 Créditos y Bibliografía</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Fuentes oficiales donde encontrar la información que sustenta este curso</div>
+
+  <div class="card">
+    <div class="card-label">📜 Normativa oficial</div>
+    <div class="items-list" style="margin-top:4px">
+      <div class="item-row"><div class="item-dot"></div>
+        <span><strong>DS N°66</strong> — Decreto Supremo que regula instalaciones interiores de gas<br>
+        <a href="https://www.bcn.cl/leychile/navegar?idNorma=263058" target="_blank" style="color:var(--accent);font-size:11px">bcn.cl/leychile/navegar?idNorma=263058 ↗</a></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">🔌 Superintendencia de Electricidad y Combustibles (SEC)</div>
+    <div class="items-list" style="margin-top:4px">
+      <div class="item-row"><div class="item-dot"></div>
+        <span><strong>RNII — Registro Nacional de Instaladores e Instalaciones</strong><br>
+        <a href="https://wlhttp.sec.cl/rnii/home" target="_blank" style="color:var(--accent);font-size:11px">wlhttp.sec.cl/rnii/home ↗</a></span>
+      </div>
+      <div class="item-row"><div class="item-dot"></div>
+        <span><strong>Sitio oficial SEC</strong> — Consultas, trámites y normativa<br>
+        <a href="https://www.sec.cl" target="_blank" style="color:var(--accent);font-size:11px">sec.cl ↗</a></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">🎓 Certificación y competencias laborales</div>
+    <div class="items-list" style="margin-top:4px">
+      <div class="item-row"><div class="item-dot"></div>
+        <span><strong>ChileValora</strong> — Evaluación y certificación de competencias laborales<br>
+        <a href="https://www.chilevalora.cl" target="_blank" style="color:var(--accent);font-size:11px">chilevalora.cl ↗</a></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">📖 Fuentes técnicas y legales</div>
+    <div class="items-list" style="margin-top:4px">
+      <div class="item-row"><div class="item-dot"></div>
+        <span><strong>Biblioteca del Congreso Nacional (BCN)</strong> — Texto completo del DS N°66 y otras normas<br>
+        <a href="https://www.bcn.cl" target="_blank" style="color:var(--accent);font-size:11px">bcn.cl ↗</a></span>
+      </div>
+      <div class="item-row"><div class="item-dot"></div>
+        <span><strong>INN — Instituto Nacional de Normalización</strong> — Normas Chilenas (NCh) aplicables a instalaciones de gas<br>
+        <a href="https://www.inn.cl" target="_blank" style="color:var(--accent);font-size:11px">inn.cl ↗</a></span>
+      </div>
+      <div class="item-row"><div class="item-dot"></div>
+        <span><strong>Ministerio de Energía</strong> — Política energética y regulaciones del sector<br>
+        <a href="https://www.energia.gob.cl" target="_blank" style="color:var(--accent);font-size:11px">energia.gob.cl ↗</a></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:var(--accent);background:linear-gradient(135deg,var(--surface),#0f1829)">
+    <div class="card-label">✨ Sobre esta plataforma</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+
+      <div>
+        <div style="font-size:16px;font-weight:900;color:var(--text)">Ruta SEC · Clase 3 Gas</div>
+        <div style="font-size:12px;color:var(--accent2);font-weight:700;margin-top:2px">Plataforma de autoaprendizaje offline</div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px">
+      Herramienta de preparación para la certificación ChileValora de instaladores de gas. Funciona 100% offline, sin conexión a internet.<br><br>
+      Esta plataforma no reemplaza la instrucción presencial ni el conocimiento práctico. Siempre consulta las fuentes oficiales antes de ejecutar cualquier instalación.
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:14px">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px">Desarrolladora</div>
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px">Johanna Torres</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Instructora &amp; Diseñadora de aprendizaje</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="mailto:johanna.ttorres@gmail.com" style="display:flex;align-items:center;gap:8px;color:var(--accent);font-size:12px;text-decoration:none">
+          <span style="font-size:16px">📧</span> johanna.ttorres@gmail.com
+        </a>
+        <a href="https://www.linkedin.com/in/johannattorres/" target="_blank" style="display:flex;align-items:center;gap:8px;color:var(--accent);font-size:12px;text-decoration:none">
+          <span style="font-size:16px">💼</span> linkedin.com/in/johannattorres
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- Notificación toast -->
+<div class="notif" id="notif"></div>
+
+<script>
+// ══════════════════════════════════════
+// ESTADO GLOBAL
+// ══════════════════════════════════════
+const STATE_KEY = 'rutasec_v1';
+let state = {
+  done: {},
+  quizScores: {},
+  xp: 0,
+  streak: 0,
+  lastStudy: null,
+  studyMinutes: 0,
+  diagScore: null,
+  interScore: null,
+  simScore: null,
+  sessionStart: Date.now()
+};
+
+function loadState(){
+  try{const s=localStorage.getItem(STATE_KEY);if(s)state={...state,...JSON.parse(s)};}catch(e){}
+}
+function saveState(){
+  state.studyMinutes += Math.round((Date.now()-state.sessionStart)/60000);
+  state.sessionStart = Date.now();
+  try{localStorage.setItem(STATE_KEY,JSON.stringify(state));}catch(e){}
+}
+
+// ══════════════════════════════════════
+// COMPETENCIAS CONFIG
+// ══════════════════════════════════════
+const COMPS = [
+  {id:'normativa',   name:'Normativa DS66',   icon:'📋', screen:'s-normativa',   sub:'Reglamento y tipos de licencias'},
+  {id:'materiales',  name:'Materiales',        icon:'🔧', screen:'s-materiales',  sub:'Tuberías, válvulas y accesorios'},
+  {id:'ventilacion', name:'Ventilación',       icon:'💨', screen:'s-ventilacion', sub:'Cálculo y requisitos mínimos'},
+  {id:'hermeticidad',name:'Hermeticidad',      icon:'🔍', screen:'s-hermeticidad',sub:'Pruebas de presión y fugas'},
+  {id:'seguridad',   name:'Seguridad',         icon:'🛡️', screen:'s-seguridad',   sub:'Válvulas, distancias y emergencias'},
+  {id:'calculos',    name:'Cálculos',          icon:'📐', screen:'s-calculos',    sub:'UA, potencias y diámetros'},
+  {id:'artefactos',  name:'Artefactos a Gas',  icon:'🔥', screen:'s-artefactos',  sub:'Tipos, restricciones y tiraje'},
+  {id:'inspeccion',  name:'Proceso ChileValora',icon:'🏛️',screen:'s-inspeccion',  sub:'Evaluación y errores frecuentes'},
+];
+
+// ══════════════════════════════════════
+// BANCO DE PREGUNTAS — 106 preguntas
+// ══════════════════════════════════════
+const QUIZZES = {
+  normativa:[
+    {q:'¿Qué decreto regula las instalaciones interiores de gas en Chile?',opts:['DS N°1','DS N°66','DS N°148','NCh 2255'],ans:1,exp:'El DS N°66 del Ministerio de Economía regula todas las instalaciones interiores y medidores de gas.'},
+    {q:'Un instalador Clase 3 puede realizar instalaciones de hasta:',opts:['50 UA','100 UA','200 UA','Sin límite'],ans:2,exp:'La Clase 3 habilita para instalaciones hasta 200 UA. La Clase 4 no tiene límite.'},
+    {q:'¿Qué significa "UA" en instalaciones de gas?',opts:['Unión Autorizada','Unidad de Artefacto','Umbral de Aprobación','Unidad de Acceso'],ans:1,exp:'UA = Unidad de Artefacto. Es la medida estándar del consumo de gas que define el diámetro necesario.'},
+    {q:'¿Qué organismo emite las licencias de instalador de gas en Chile?',opts:['ChileValora','SEC','MINVU','Ministerio de Energía'],ans:1,exp:'La SEC (Superintendencia de Electricidad y Combustibles) emite y regula las licencias de instalador de gas.'},
+    {q:'¿Cuántas clases de licencias de instalador contempla el DS N°66?',opts:['2 clases','3 clases','4 clases','5 clases'],ans:2,exp:'El DS N°66 contempla 4 clases: Clase 1 (hasta 5 UA), Clase 2 (hasta 50 UA), Clase 3 (hasta 200 UA) y Clase 4 (sin límite).'},
+    {q:'Un instalador Clase 4 puede realizar instalaciones de:',opts:['Hasta 200 UA','Hasta 500 UA','Sin límite de UA','Solo instalaciones industriales'],ans:2,exp:'La Clase 4 es la máxima habilitación. No tiene límite de UA y puede ejecutar cualquier tipo de instalación.'},
+    {q:'¿Qué significa RNII?',opts:['Registro Nacional de Instaladores e Instalaciones','Reglamento Nacional de Infraestructura Industrial','Registro Normativo de Instalaciones Interiores','Reglamento Nacional de Instalaciones de Gas'],ans:0,exp:'RNII = Registro Nacional de Instaladores e Instalaciones. Base de datos de la SEC con todos los instaladores habilitados.'},
+    {q:'¿Cuál es el límite de UA para un instalador Clase 1?',opts:['Hasta 5 UA','Hasta 10 UA','Hasta 20 UA','Hasta 50 UA'],ans:0,exp:'La Clase 1 es la habilitación básica, solo para instalaciones muy pequeñas de hasta 5 UA.'},
+    {q:'¿Cuál es el límite de UA para un instalador Clase 2?',opts:['Hasta 20 UA','Hasta 50 UA','Hasta 100 UA','Sin límite'],ans:1,exp:'La Clase 2 habilita hasta 50 UA, suficiente para casas unifamiliares de complejidad media.'},
+    {q:'¿El DS N°66 aplica a instalaciones de qué tipo de gas?',opts:['Solo gas natural','Solo GLP','Gas natural y GLP','Solo gas de ciudad'],ans:2,exp:'El DS N°66 aplica a ambos tipos: gas natural (cañería) y GLP (cilindros o estanque).'},
+    {q:'Al terminar una instalación, el instalador habilitado debe:',opts:['Solo entregar las llaves al cliente','Emitir un certificado de la instalación','Llamar a la SEC para que inspeccione','No tiene obligaciones formales'],ans:1,exp:'El instalador tiene la obligación de emitir un certificado de la instalación realizada, firmado con su licencia.'},
+    {q:'¿Qué siglas corresponden a la Superintendencia que fiscaliza el gas en Chile?',opts:['SII','SAG','SEC','SERNAC'],ans:2,exp:'SEC = Superintendencia de Electricidad y Combustibles. Regula y fiscaliza los sectores eléctrico, gas y combustibles.'},
+    {q:'Una instalación que supera las 200 UA requiere como mínimo un instalador de:',opts:['Clase 2','Clase 3','Clase 4','No existe esa limitación'],ans:2,exp:'Instalaciones que superan las 200 UA están fuera del alcance de la Clase 3. Requieren un instalador Clase 4.'},
+    {q:'¿Qué organismo acredita las competencias laborales para obtener la licencia SEC?',opts:['La SEC directamente','ChileValora','El Ministerio de Energía','La distribuidora de gas'],ans:1,exp:'ChileValora es el organismo del Estado encargado de evaluar y certificar competencias laborales, incluyendo las de instalador de gas.'},
+    {q:'¿Qué diferencia al gas natural del GLP en cuanto a densidad respecto al aire?',opts:['Ambos son más pesados que el aire','El gas natural es más liviano; el GLP es más pesado','El GLP es más liviano; el gas natural es más pesado','Ambos son igual de densos'],ans:1,exp:'El gas natural (metano) es más liviano que el aire y sube en fuga. El GLP es más pesado y se acumula en zonas bajas.'},
+  ],
+  materiales:[
+    {q:'¿Qué material de tubería está PROHIBIDO en instalaciones interiores según el DS66?',opts:['Cobre','Acero negro','Polietileno (PE)','Acero galvanizado'],ans:2,exp:'El polietileno (PE) solo está autorizado para instalaciones enterradas. En interior está estrictamente prohibido.'},
+    {q:'¿Dónde es OBLIGATORIA la instalación de una válvula de corte?',opts:['Solo en la entrada general','Solo antes del calefón','Antes de CADA artefacto','Solo en instalaciones industriales'],ans:2,exp:'El DS66 exige válvula de corte antes de cada artefacto, además de válvulas general y de ramal.'},
+    {q:'Cuando se juntan tuberías de cobre y acero, ¿qué accesorio es obligatorio?',opts:['Codo de reducción','Unión dieléctrica','Adaptador roscado','Soldadura blanda'],ans:1,exp:'La unión dieléctrica evita la corrosión galvánica entre materiales distintos.'},
+    {q:'¿Cuál es el material más utilizado para tuberías de gas en instalaciones interiores domiciliarias?',opts:['Acero negro','Cobre','PVC','Hierro fundido'],ans:1,exp:'El cobre es el más utilizado en instalaciones interiores por su durabilidad, resistencia a la corrosión y facilidad de instalación.'},
+    {q:'¿El polietileno (PE) puede usarse en instalaciones de gas enterradas?',opts:['No, nunca puede usarse PE','Sí, es el material preferido para uso enterrado','Solo en gas natural, no GLP','Solo en profundidad mayor a 1 metro'],ans:1,exp:'El polietileno es ideal para instalaciones enterradas por su resistencia a la corrosión, pero NUNCA en instalaciones interiores.'},
+    {q:'¿Qué tipo de soldadura se usa para unir tuberías de cobre en instalaciones de gas?',opts:['Soldadura blanda (estaño)','Soldadura fuerte (latón o cobre-fósforo)','Soldadura MIG','Soldadura TIG'],ans:1,exp:'La soldadura fuerte garantiza uniones de alta resistencia mecánica y temperatura. La soldadura blanda no es aceptada para gas.'},
+    {q:'Una manguera flexible de conexión para artefactos:',opts:['Puede pasar por muros sin problema','No debe ir empotrada ni pasar por muros o losas','Es el sistema más seguro disponible','Puede usarse para cualquier longitud'],ans:1,exp:'Las mangueras flexibles no deben empotrase, pasar por muros o tener longitudes excesivas. Solo son para la conexión final al artefacto.'},
+    {q:'¿Cuántas válvulas de corte mínimas debe tener una instalación con 3 artefactos?',opts:['3 (solo de artefacto)','4 (1 general + 3 de artefacto)','5 (1 general + 1 ramal + 3 artefacto)','2 (general y una común)'],ans:1,exp:'Mínimo: 1 válvula general + 1 por cada artefacto = 4. Si hay ramales, se suman válvulas de ramal.'},
+    {q:'¿Para qué sirve la vaina protectora en el paso de una tubería por un muro?',opts:['Aumentar la presión de gas','Proteger la tubería y facilitar cambios sin demoler','Evitar la expansión térmica','Mejorar la estética'],ans:1,exp:'La vaina protectora protege la tubería de daños mecánicos al atravesar muros y permite reemplazarla sin demolición.'},
+    {q:'¿Puede usarse PVC para tuberías de gas interior?',opts:['Sí, si tiene presión nominal adecuada','No, está completamente prohibido para gas','Solo para baja presión','Solo para GLP'],ans:1,exp:'El PVC no está autorizado para ninguna instalación de gas, ni interior ni exterior. No resiste las condiciones requeridas.'},
+    {q:'El acero galvanizado en instalaciones de gas interior presenta el riesgo de:',opts:['Explosión espontánea','Corrosión galvánica en las roscas con el tiempo','Contaminar el gas','Aumentar la presión'],ans:1,exp:'La capa de zinc del galvanizado puede deteriorarse, especialmente en las roscas, generando corrosión y posibles fugas.'},
+    {q:'¿Cuál es la función principal de una válvula de ramal?',opts:['Controlar el flujo a un artefacto específico','Cortar el suministro a una zona o piso completo','Medir el consumo de gas','Regular la presión de entrada'],ans:1,exp:'Las válvulas de ramal permiten cortar el suministro a una zona (piso, cocina, calefacción) sin afectar el resto.'},
+    {q:'¿Qué norma técnica chilena complementa al DS N°66 en materiales para gas?',opts:['NCh 2255','NCh 430','NCh 2369','NCh 2901'],ans:0,exp:'NCh 2255 (y otras normas relacionadas) establece requisitos técnicos para materiales y accesorios de instalaciones de gas interior.'},
+    {q:'¿Qué tipo de accesorio se usa para reducir el diámetro de una tubería de gas?',opts:['Codo','Tee','Reductor o bushing','Unión universal'],ans:2,exp:'El reductor (o bushing) es el accesorio que permite la transición entre dos diámetros distintos de tubería.'},
+    {q:'¿Puede instalarse tubería de gas a la vista (sin embutir)?',opts:['No, siempre debe ir embutida','Sí, es la instalación preferida en interiores','Solo en recintos industriales','Solo en exteriores'],ans:1,exp:'La instalación a la vista es preferida en interiores porque facilita la inspección y el mantenimiento.'},
+  ],
+  ventilacion:[
+    {q:'¿Cuál es el área mínima de rejilla de ventilación por cada 1.000 kcal/h de potencia?',opts:['25 cm²','50 cm²','100 cm²','150 cm²'],ans:1,exp:'El DS66 establece 50 cm² de rejilla (entrada y salida) por cada 1.000 kcal/h de potencia instalada.'},
+    {q:'Un calefón de 30.000 kcal/h requiere una rejilla de entrada de mínimo:',opts:['500 cm²','1.000 cm²','1.500 cm²','3.000 cm²'],ans:2,exp:'30.000 ÷ 1.000 × 50 = 1.500 cm². Fórmula: (potencia ÷ 1.000) × 50.'},
+    {q:'¿Cuándo es OBLIGATORIO el ducto de evacuación para un calefón?',opts:['Solo en baños','Solo en habitaciones','SIEMPRE, sin excepción','Solo en espacios menores a 10 m²'],ans:2,exp:'Los calefones SIEMPRE requieren ducto de evacuación de gases al exterior, independiente de la ubicación.'},
+    {q:'¿Para qué sirve la ventilación en un recinto con artefactos a gas?',opts:['Solo para el confort térmico','Para proveer oxígeno para la combustión y evacuar gases','Para regular la presión del gas','Para enfriar los artefactos'],ans:1,exp:'La ventilación provee oxígeno suficiente para la combustión y evacua los gases producidos por los artefactos.'},
+    {q:'¿Dónde debe ubicarse preferentemente la rejilla de entrada de aire?',opts:['En la parte alta del recinto','En el centro del muro','En la parte baja del recinto','No importa la altura'],ans:2,exp:'La rejilla de entrada va en la parte baja porque el aire frío es más denso. La de salida va arriba.'},
+    {q:'¿Dónde debe ubicarse la rejilla de salida de gases?',opts:['En la parte baja del recinto','En el centro del muro','En la parte alta del recinto','No importa la ubicación'],ans:2,exp:'Los gases calientes de la combustión son más livianos y suben. La rejilla de salida va en la parte alta del recinto.'},
+    {q:'Un recinto con calefón de 20.000 kcal/h requiere rejilla de entrada de mínimo:',opts:['500 cm²','750 cm²','1.000 cm²','2.000 cm²'],ans:2,exp:'20.000 ÷ 1.000 × 50 = 1.000 cm². Fórmula: (potencia ÷ 1.000) × 50 cm².'},
+    {q:'¿Qué es el CO (monóxido de carbono)?',opts:['Dióxido de carbono normal','Gas inodoro e incoloro producto de combustión incompleta, potencialmente letal','Oxígeno concentrado','Hidrógeno liberado por el gas'],ans:1,exp:'El CO es el principal peligro en instalaciones mal ventiladas. Indetectable sin equipo y provoca intoxicación y muerte.'},
+    {q:'¿Cuándo se produce combustión incompleta?',opts:['Cuando hay demasiado oxígeno','Cuando la llama es azul','Cuando hay insuficiente oxígeno en el recinto','Cuando el gas está frío'],ans:2,exp:'La combustión incompleta ocurre cuando no hay suficiente oxígeno. Genera CO en lugar de CO₂, lo que es muy peligroso.'},
+    {q:'¿Puede el ducto de evacuación del calefón terminar en el cielo falso?',opts:['Sí, si el cielo falso es amplio','No, debe salir al exterior del edificio','Solo temporalmente durante la obra','Sí, en departamentos de edificios'],ans:1,exp:'El ducto SIEMPRE debe salir al exterior. Un ducto en el cielo falso genera acumulación de CO.'},
+    {q:'¿Puede una rejilla de ventilación tener malla protectora?',opts:['No, nunca puede tener rejilla','Sí, pero la malla no puede reducir la sección libre mínima','Solo malla metálica','Solo en recintos exteriores'],ans:1,exp:'La rejilla puede tener protección antipájaros o anti-insectos, pero la sección libre efectiva debe cumplir la norma.'},
+    {q:'Una cocina con potencia total de 8.000 kcal/h requiere rejilla de entrada de:',opts:['200 cm²','300 cm²','400 cm²','800 cm²'],ans:2,exp:'8.000 ÷ 1.000 × 50 = 400 cm². Aplica la misma fórmula independiente del tipo de artefacto.'},
+    {q:'¿Qué se entiende por "ventilación de combustión"?',opts:['La ventilación que elimina olores','El suministro de aire necesario para que el artefacto queme correctamente','El sistema de extractores eléctricos','La ventilación del edificio en general'],ans:1,exp:'La ventilación de combustión es el aire mínimo necesario para que los quemadores operen correctamente y sin generar CO.'},
+    {q:'¿Por qué el GLP presenta mayor riesgo de acumulación que el gas natural en recintos mal ventilados?',opts:['Porque es más frío','Porque es más pesado que el aire y se acumula en zonas bajas','Porque es más inflamable','Porque huele más fuerte'],ans:1,exp:'El GLP (propano-butano) es más pesado que el aire. En fuga, se acumula en el suelo y espacios cerrados como sótanos.'},
+    {q:'¿Qué indica una llama amarilla o anaranjada en un artefacto a gas?',opts:['Que el gas está a alta presión','Combustión incompleta, posible generación de CO','Que el artefacto es eficiente','Que la llama es normal'],ans:1,exp:'Una llama azul = buena combustión. Una llama amarilla/anaranjada = combustión incompleta y posible generación de CO.'},
+  ],
+  hermeticidad:[
+    {q:'¿Cuál es la presión mínima de prueba de hermeticidad para instalaciones de baja presión?',opts:['100 mm.c.a.','200 mm.c.a.','300 mm.c.a.','500 mm.c.a.'],ans:2,exp:'El DS66 establece una presión mínima de 300 mm de columna de agua para instalaciones de baja presión.'},
+    {q:'¿Cuánto tiempo mínimo debe durar la prueba de hermeticidad?',opts:['10 minutos','15 minutos','30 minutos','60 minutos'],ans:2,exp:'La prueba debe mantenerse mínimo 30 minutos sin caída observable de presión para ser válida.'},
+    {q:'Durante la prueba de hermeticidad, los artefactos deben estar:',opts:['Encendidos al mínimo','Apagados pero conectados','Desconectados de la tubería','No importa su estado'],ans:2,exp:'Los artefactos deben estar desconectados. Presurizar con ellos conectados puede dañarlos y da resultados no confiables.'},
+    {q:'¿Qué instrumento se usa para medir la presión en la prueba de hermeticidad?',opts:['Termómetro','Manómetro de columna de agua o de aguja calibrado','Higrómetro','Flujómetro'],ans:1,exp:'El manómetro (columna de agua o de aguja) es el instrumento específico para medir la presión durante la prueba.'},
+    {q:'¿Qué significa mm.c.a.?',opts:['Milímetros cúbicos de agua','Milímetros de columna de agua','Metros cúbicos de aire','Milímetros cuadrados de apertura'],ans:1,exp:'mm.c.a. = milímetros de columna de agua. Unidad de presión muy usada en instalaciones de gas de baja presión.'},
+    {q:'¿Qué indica que una instalación NO aprobó la prueba de hermeticidad?',opts:['Que el manómetro marcó más de 300 mm.c.a.','Cualquier caída de presión durante los 30 minutos','Que la prueba duró menos de 15 minutos','Que los artefactos estaban conectados'],ans:1,exp:'Cualquier caída de presión, por pequeña que sea, indica fuga. La instalación no aprueba y debe repararse.'},
+    {q:'¿Con qué producto se detectan fugas en las uniones durante la prueba?',opts:['Pintura fluorescente','Agua jabonosa o solución detectora de fugas','Agua sola','Spray de silicona'],ans:1,exp:'El agua jabonosa es el método tradicional: forma burbujas en el punto exacto de la fuga.'},
+    {q:'Si se detecta una fuga, ¿qué se debe hacer?',opts:['Continuar la prueba e inyectar más presión','Reparar la fuga y repetir la prueba completa desde cero','Solo anotar la fuga y aprobar igual','Reparar y continuar desde donde estaba'],ans:1,exp:'Reparada la fuga, se repite la prueba COMPLETA desde cero (nueva presurización y 30 minutos nuevos).'},
+    {q:'¿La prueba de hermeticidad se aplica solo a instalaciones nuevas?',opts:['Sí, solo en instalaciones nuevas','No, también tras modificaciones o reparaciones','Solo cuando el inspector lo solicite','Solo en instalaciones de GLP'],ans:1,exp:'La hermeticidad debe verificarse siempre que se modifique, repare o amplíe una instalación, no solo cuando es nueva.'},
+    {q:'¿Cómo se genera la presión para la prueba de hermeticidad?',opts:['Con el propio gas natural a presión de red','Con aire comprimido mediante bomba o compresor manual','Con agua a presión','Con nitrógeno inerte'],ans:1,exp:'Se usa aire comprimido (no gas) para la prueba. Puede ser con bomba manual, de bicicleta o compresor pequeño.'},
+    {q:'¿Cuándo se considera que una instalación aprueba la hermeticidad?',opts:['Cuando el manómetro sube a 300 mm.c.a.','Cuando la presión se mantiene estable durante 30 minutos sin ninguna caída','Cuando el inspector firma el documento','Cuando se encienden los artefactos sin incidentes'],ans:1,exp:'La aprobación requiere que la presión (≥300 mm.c.a.) se mantenga estable durante 30 minutos completos.'},
+    {q:'¿Por qué se usa aire en lugar de gas para la prueba de hermeticidad?',opts:['Porque el gas natural no es adecuado','Por seguridad: el aire no es inflamable y permite detectar fugas sin riesgo','Porque es más barato','Porque da mayor presión'],ans:1,exp:'Usar gas en una instalación no verificada sería peligroso. El aire comprimido permite la prueba sin riesgo de incendio o explosión.'},
+  ],
+  seguridad:[
+    {q:'¿Cuál es la distancia mínima entre una tubería de gas y una tubería eléctrica?',opts:['10 cm','20 cm','30 cm','50 cm'],ans:2,exp:'El DS66 establece una separación mínima de 30 cm entre tuberías de gas y eléctricas.'},
+    {q:'En caso de detectar olor a gas en un recinto, ¿cuál es el PRIMER paso?',opts:['Llamar al 133','Encender las luces para ver mejor','Cerrar la válvula de corte general','Abrir las ventanas'],ans:2,exp:'Lo PRIMERO es cerrar la válvula de corte general para detener el flujo de gas. Luego ventilar y llamar desde afuera.'},
+    {q:'Al paso de una tubería de gas por un muro, ¿qué se requiere?',opts:['Pintura especial','Vaina protectora','Soldadura adicional','Nada especial'],ans:1,exp:'Todo paso de tubería por muros debe llevar vaina protectora para evitar fricción y daños.'},
+    {q:'¿Qué NO se debe hacer durante una emergencia por fuga de gas?',opts:['Cerrar la válvula general','Abrir ventanas','Encender o apagar interruptores eléctricos','Evacuar el recinto'],ans:2,exp:'Los interruptores pueden generar chispa eléctrica que ignite el gas. No se deben tocar hasta que el recinto esté ventilado.'},
+    {q:'¿Por qué no se debe usar el teléfono dentro del recinto durante una fuga?',opts:['Porque interrumpe la comunicación de emergencia','Porque puede generar arco eléctrico que ignite el gas','Porque daña el teléfono','No es necesaria esa precaución'],ans:1,exp:'Los teléfonos (incluso celulares) pueden generar descargas al encenderse. Deben usarse desde afuera del recinto.'},
+    {q:'¿A qué distancia mínima de una fuente de calor debe ir una tubería de gas?',opts:['5 cm','10 cm','15 cm','25 cm'],ans:2,exp:'El DS66 establece una distancia mínima de 15 cm entre tuberías de gas y cualquier fuente de calor.'},
+    {q:'¿Qué se debe hacer después de reparar una fuga de gas?',opts:['Poner en servicio de inmediato','Realizar prueba de hermeticidad completa antes de poner en servicio','Solo revisar visualmente','Esperar 24 horas'],ans:1,exp:'Toda reparación debe ir seguida de prueba de hermeticidad completa (300 mm.c.a. por 30 min) antes de reponer el suministro.'},
+    {q:'¿Cuál es el paso número 2 del protocolo de emergencia por fuga de gas?',opts:['Cerrar la válvula general','Ventilar el recinto abriendo ventanas y puertas','Llamar a la distribuidora','Evacuar personas'],ans:1,exp:'Después de cerrar la válvula (paso 1), el paso 2 es ventilar: abrir todas las ventanas y puertas para disipar el gas.'},
+    {q:'¿Qué característica debe tener la válvula general de corte?',opts:['Puede estar oculta si el instalador sabe dónde está','Debe estar siempre visible y accesible sin herramientas','Solo el dueño necesita saber dónde está','Puede estar en cualquier lugar del recinto'],ans:1,exp:'La válvula general debe poder cerrarse rápidamente en emergencia. Debe ser visible y accesible para cualquier persona.'},
+    {q:'¿El gas natural sube o baja en caso de fuga?',opts:['Baja (es más pesado que el aire)','Sube (es más liviano que el aire)','Se queda en la misma altura','Depende de la temperatura'],ans:1,exp:'El gas natural (metano) es más liviano que el aire y sube. Los detectores de gas natural se instalan en la parte alta.'},
+    {q:'¿Puede instalarse tubería de gas junto a una tubería de agua caliente sanitaria?',opts:['No, está completamente prohibido','Sí, manteniendo distancia y sin contacto directo','Solo si las temperaturas no superan 60°C','Solo con aislación entre ellas'],ans:1,exp:'No está prohibido, pero deben mantenerse separadas, bien fijadas y sin contacto directo para evitar daños mutuos.'},
+    {q:'¿Cuándo se puede reingresar a un recinto después de una fuga de gas?',opts:['Después de 30 minutos','Cuando ya no se percibe olor a gas','Solo cuando el instalador o distribuidora lo autorice','Después de ventilar 10 minutos'],ans:2,exp:'NUNCA reingresar por cuenta propia. Solo es seguro cuando el instalador o la distribuidora lo autorizan tras verificar.'},
+  ],
+  calculos:[
+    {q:'Una vivienda tiene: 1 cocina, 1 calefón 14L y 1 calefactor de 12.000 kcal/h. ¿Cuántas UA?',opts:['3 UA','4 UA','5 UA','6 UA'],ans:2,exp:'Cocina = 1UA, Calefón 14L = 2UA, Calefactor 12.000 kcal/h = 2UA (12.000÷6.000=2). Total = 5 UA.'},
+    {q:'Para una instalación de 12 UA en gas natural baja presión, el diámetro mínimo es:',opts:['1/2" (15mm)','3/4" (20mm)','1" (25mm)','1¼" (32mm)'],ans:2,exp:'12 UA está en el rango 5-15 UA, por lo tanto se requiere mínimo 1" (25 mm).'},
+    {q:'¿Qué potencia típica representa 1 UA en un artefacto tipo cocina/horno?',opts:['1.000 kcal/h','6.000 kcal/h','~18.000 kcal/h','30.000 kcal/h'],ans:2,exp:'Una cocina/horno estándar equivale a 1 UA y tiene una potencia típica de ~18.000 kcal/h.'},
+    {q:'¿Cuántas UA tiene un calefactor ambiente de 18.000 kcal/h?',opts:['1 UA','2 UA','3 UA','4 UA'],ans:2,exp:'Para calefactores ambiente: UA = kcal/h ÷ 6.000. Entonces 18.000 ÷ 6.000 = 3 UA.'},
+    {q:'¿Qué diámetro mínimo se necesita para una instalación de 4 UA?',opts:['1/2" (15 mm)','3/4" (20 mm)','1" (25 mm)','1¼" (32 mm)'],ans:1,exp:'4 UA está dentro del rango "hasta 5 UA", por lo tanto el diámetro mínimo es 3/4" (20 mm).'},
+    {q:'¿Qué diámetro mínimo se necesita para una instalación de 20 UA?',opts:['3/4" (20 mm)','1" (25 mm)','1¼" (32 mm)','1½" (40 mm)'],ans:2,exp:'20 UA está en el rango 15-30 UA. El diámetro mínimo para ese rango es 1¼" (32 mm).'},
+    {q:'Una instalación: 1 cocina (1UA) + 1 calefón AR (3UA) + calefactor 12.000 kcal/h (2UA). Diámetro:',opts:['3/4" (20 mm)','1" (25 mm)','1¼" (32 mm)','1½" (40 mm)'],ans:1,exp:'Total = 1+3+2 = 6 UA. El rango 5-15 UA requiere diámetro mínimo 1" (25 mm).'},
+    {q:'¿Para qué rango de UA se usa diámetro 1½" (40 mm)?',opts:['5 a 15 UA','15 a 30 UA','30 a 60 UA','Más de 60 UA'],ans:2,exp:'El diámetro 1½" (40 mm) se usa para instalaciones en el rango de 30 a 60 UA.'},
+    {q:'¿Cuántas UA equivale un calefón instantáneo de 10 a 14 litros?',opts:['1 UA','2 UA','3 UA','4 UA'],ans:1,exp:'Los calefones instantáneos de 10 a 14 litros por minuto tienen asignada una equivalencia de 2 UA por norma.'},
+    {q:'Una instalación: 2 cocinas + 2 calefones 14L + 1 calefactor 6.000 kcal/h. Total UA y diámetro:',opts:['6 UA — 3/4"','7 UA — 1"','8 UA — 1"','9 UA — 1"'],ans:1,exp:'2×1 + 2×2 + 1×1 = 7 UA. Rango 5-15 UA → diámetro 1" (25 mm).'},
+    {q:'¿Por qué es importante calcular las UA correctamente?',opts:['Solo para cumplir un requisito burocrático','Para asegurar que el diámetro permita el caudal sin pérdida de presión excesiva','Para calcular el costo de la instalación','Para determinar el tipo de válvula'],ans:1,exp:'Un cálculo errado de UA lleva a subdiameter las tuberías, causando pérdida de presión y mal funcionamiento de los artefactos.'},
+    {q:'Un calefón de alto rendimiento con más de 40.000 kcal/h equivale a:',opts:['2 UA','3 UA','4 UA','5 UA'],ans:1,exp:'Los calefones de alto rendimiento (>40.000 kcal/h) tienen asignados 3 UA en la tabla estándar.'},
+    {q:'¿Qué diámetro mínimo se requiere para más de 60 UA?',opts:['1½" (40 mm)','1¾" (45 mm)','2" (50 mm) o más','No existe diámetro estándar'],ans:2,exp:'Instalaciones de más de 60 UA requieren mínimo 2" (50 mm). Para mayores caudales, se requiere cálculo específico.'},
+    {q:'¿Qué factor NO se puede ignorar al dimensionar tuberías de gas?',opts:['El color de la tubería','La longitud total del ramal (pérdida de presión)','La marca de los artefactos','El día en que se instala'],ans:1,exp:'La longitud de la tubería genera pérdida de presión. A mayor longitud, puede requerirse mayor diámetro para compensar.'},
+    {q:'¿Cuántas UA tiene una caldera de calefacción central de mediana capacidad?',opts:['1 a 3 UA','3 a 5 UA','6 a 12 UA','Más de 20 UA'],ans:2,exp:'Las calderas de calefacción central se sitúan entre 6 y 12 UA dependiendo de su potencia, que supera los 60.000 kcal/h.'},
+  ],
+  artefactos:[
+    {q:'¿En qué situación un calefón puede instalarse en un baño según el DS66?',opts:['Si el baño tiene ventana','Si el baño es grande','Si es de cámara estanca con salida directa al exterior','Nunca está permitido'],ans:2,exp:'Solo los calefones de cámara estanca con salida directa al exterior pueden instalarse en baños.'},
+    {q:'Un calefactor ambiente en un dormitorio:',opts:['Está siempre prohibido','Requiere ducto de evacuación','Es libre sin restricciones','Solo se prohíbe en habitaciones de niños'],ans:1,exp:'Los calefactores en dormitorios requieren ducto de evacuación al exterior. Sin él, el CO puede acumularse durante el sueño.'},
+    {q:'¿Qué tipo de tiraje permite instalar el ducto de evacuación en posición horizontal?',opts:['Tiraje natural','Tiro balanceado','Tiraje forzado','Ninguno permite ducto horizontal'],ans:2,exp:'El tiraje forzado usa un ventilador para expulsar los gases, lo que permite ductos horizontales.'},
+    {q:'¿Qué es el monóxido de carbono (CO)?',opts:['Un gas combustible como el gas natural','Gas inodoro e incoloro producto de combustión incompleta, potencialmente letal','Un gas detectable fácilmente por olor','El mismo que el dióxido de carbono (CO₂)'],ans:1,exp:'El CO es el principal peligro silencioso. Inodoro, incoloro y letal en concentraciones bajas. Se genera en combustión incompleta.'},
+    {q:'¿Un calefón de tiraje natural puede instalarse en un baño sin ventilación al exterior?',opts:['Sí, si el baño tiene suficiente volumen','No, solo calefones de cámara estanca son permitidos en baños','Sí, con extractor eléctrico','No, todos los calefones están prohibidos en baños'],ans:1,exp:'Solo los calefones de cámara estanca están permitidos en baños. El tiraje natural requiere espacio exterior para el ducto vertical.'},
+    {q:'¿Qué tipo de artefacto toma el aire para combustión directamente del exterior?',opts:['Tiraje natural','Tiraje forzado','Cámara estanca (balanced flue)','Todos los artefactos modernos'],ans:2,exp:'La cámara estanca es un sistema hermético con doble tubería: toma aire del exterior y expulsa gases al exterior.'},
+    {q:'¿Puede instalarse una estufa portátil a gas en un dormitorio?',opts:['Sí, si se apaga al dormir','No, está prohibida en dormitorios por riesgo de CO','Sí, si el dormitorio es amplio','Solo en invierno'],ans:1,exp:'Las estufas portátiles a gas están expresamente prohibidas en dormitorios por el riesgo de intoxicación con CO durante el sueño.'},
+    {q:'¿Con qué material deben fabricarse los ductos de evacuación de artefactos a gas?',opts:['PVC resistente al calor','Cobre','Acero galvanizado, inoxidable o aluminio resistente','Fibra de vidrio'],ans:2,exp:'Los ductos de evacuación deben ser metálicos y resistentes a altas temperaturas. El PVC se derrite con el calor de los gases.'},
+    {q:'¿Qué es el "tiro balanceado" o cámara estanca?',opts:['Un sistema que balancea la presión en la red','Un artefacto con doble tubería: toma aire del exterior y expulsa gases al exterior','Un tipo de válvula de seguridad','Un sistema de equilibrado de gas en edificios'],ans:1,exp:'El tiro balanceado es el sistema más seguro: el artefacto es completamente sellado del ambiente interior y funciona solo con aire exterior.'},
+    {q:'¿Qué diferencia hay entre tiraje natural y tiraje forzado?',opts:['Solo la dirección del ducto','El natural usa convección (calor); el forzado usa ventilador mecánico','El forzado solo funciona con GLP','No hay diferencia práctica'],ans:1,exp:'Tiraje natural: la temperatura de los gases genera corriente ascendente en ducto vertical. Tiraje forzado: ventilador expulsa los gases, permite ducto horizontal.'},
+    {q:'¿Por qué es tan grave instalar un calefón estándar en un baño sin ducto de evacuación?',opts:['Solo daña el artefacto','Genera riesgo de intoxicación y muerte por CO en espacio cerrado','Aumenta la humedad del baño','Solo es un problema estético'],ans:1,exp:'El baño es un espacio cerrado donde el usuario puede quedar inconsciente por CO antes de poder salir. Es la falla más letal en gas.'},
+    {q:'¿Cuál es el objetivo del ducto de evacuación en un artefacto a gas?',opts:['Proveer gas fresco al artefacto','Expulsar al exterior los gases de combustión (CO₂, CO, vapor)','Equilibrar la presión interior','Proteger el artefacto del viento'],ans:1,exp:'El ducto evacua los gases de combustión al exterior para evitar la acumulación de CO y CO₂ en el interior.'},
+  ],
+  inspeccion:[
+    {q:'¿Cuáles son los dos tipos de evaluación que aplica ChileValora?',opts:['Escrita y oral','Teórica y práctica en terreno','Práctica y de documentos','Solo práctica'],ans:1,exp:'ChileValora aplica evaluación teórica (normativa, cálculos) y práctica (demostración en terreno o módulo de simulación).'},
+    {q:'Ante un ducto de calefón que termina en el cielo falso, el inspector debe:',opts:['Aprobarlo si el calefón es moderno','Aprobarlo si no hay quejas','Registrar no conformidad y rechazar la instalación','Pedir al dueño que lo arregle después de la aprobación'],ans:2,exp:'Todo ducto debe salir al EXTERIOR. Un ducto en el cielo falso es una no conformidad grave que impide la aprobación.'},
+    {q:'¿Qué documentación debe acreditar un candidato a la evaluación ChileValora?',opts:['Solo el título técnico','Solo las herramientas de trabajo','Experiencia laboral acreditada por empleadores','Recomendaciones de clientes'],ans:2,exp:'ChileValora requiere evidencias de desempeño laboral, incluyendo certificados o constancias de empleadores.'},
+    {q:'¿Qué es el "portfolio de evidencias" en ChileValora?',opts:['Una carpeta con fotos de instalaciones propias','Documentos que acreditan la experiencia laboral del candidato','El currículum vitae del instalador','El listado de herramientas que posee'],ans:1,exp:'El portfolio incluye documentos como certificados de empleadores, órdenes de trabajo, fotos de instalaciones, que demuestran experiencia real.'},
+    {q:'¿Qué tipo de preguntas predominan en la evaluación teórica de ChileValora?',opts:['Memorización de artículos del DS66','Aplicación práctica de la normativa y resolución de casos reales','Preguntas de historia del gas en Chile','Operación de software de diseño'],ans:1,exp:'ChileValora evalúa si el instalador puede APLICAR la normativa, no solo memorizarla. Las preguntas son de casos y situaciones reales.'},
+    {q:'¿Qué documentos debe portar el instalador habilitado en obra?',opts:['Solo su carnet de identidad','Licencia vigente y proyecto si la instalación lo requiere','Solo el contrato de trabajo','Solo la orden de compra'],ans:1,exp:'El instalador debe tener su licencia SEC vigente consigo. Para instalaciones mayores, también el proyecto aprobado.'},
+    {q:'¿Qué sucede si el instalador no tiene su licencia vigente al momento de la inspección?',opts:['Se le da un plazo para renovarla','La instalación no puede ser aprobada','Solo se levanta una observación menor','No tiene consecuencias prácticas'],ans:1,exp:'Sin licencia vigente, el inspector no puede aprobar la instalación. La habilitación debe estar vigente durante toda la ejecución.'},
+    {q:'¿Cuál es el error más frecuente en la evaluación teórica ChileValora?',opts:['No saber los precios de los materiales','No saber la presión y tiempo de hermeticidad (300 mm.c.a., 30 min)','No conocer el nombre del inspector','No saber ubicar las llaves de paso'],ans:1,exp:'La presión (300 mm.c.a.) y el tiempo (30 min) de hermeticidad son datos que el evaluador SIEMPRE pregunta. Memorizarlos es obligatorio.'},
+    {q:'¿Cuál es el espíritu de la evaluación práctica de ChileValora?',opts:['Demostrar que se ha estudiado el DS66 de memoria','Demostrar que se puede resolver problemas reales de instalación en terreno','Mostrar herramientas de trabajo','Presentar certificados de cursos realizados'],ans:1,exp:'La práctica evalúa si el instalador puede ejecutar o diagnosticar correctamente una instalación real.'},
+    {q:'¿Cuándo caduca una licencia SEC de instalador de gas?',opts:['Nunca, es vitalicia','Tiene vigencia determinada y debe renovarse periódicamente','Solo cuando el instalador se jubila','Cuando cambia el DS66'],ans:1,exp:'Las licencias SEC tienen vigencia y deben renovarse. Es responsabilidad del instalador mantenerla al día para poder ejercer legalmente.'},
+  ],
+};
+
+// ── DIAGNÓSTICO: 25 preguntas (sin timer) ──
+const DIAG_QUESTIONS = [
+  // normativa (4)
+  {...QUIZZES.normativa[0],area:'Normativa'},{...QUIZZES.normativa[3],area:'Normativa'},
+  {...QUIZZES.normativa[7],area:'Normativa'},{...QUIZZES.normativa[12],area:'Normativa'},
+  // materiales (3)
+  {...QUIZZES.materiales[0],area:'Materiales'},{...QUIZZES.materiales[2],area:'Materiales'},
+  {...QUIZZES.materiales[5],area:'Materiales'},
+  // ventilacion (3)
+  {...QUIZZES.ventilacion[0],area:'Ventilación'},{...QUIZZES.ventilacion[2],area:'Ventilación'},
+  {...QUIZZES.ventilacion[6],area:'Ventilación'},
+  // hermeticidad (3)
+  {...QUIZZES.hermeticidad[0],area:'Hermeticidad'},{...QUIZZES.hermeticidad[1],area:'Hermeticidad'},
+  {...QUIZZES.hermeticidad[4],area:'Hermeticidad'},
+  // seguridad (3)
+  {...QUIZZES.seguridad[0],area:'Seguridad'},{...QUIZZES.seguridad[1],area:'Seguridad'},
+  {...QUIZZES.seguridad[5],area:'Seguridad'},
+  // calculos (3)
+  {...QUIZZES.calculos[0],area:'Cálculos'},{...QUIZZES.calculos[1],area:'Cálculos'},
+  {...QUIZZES.calculos[4],area:'Cálculos'},
+  // artefactos (3)
+  {...QUIZZES.artefactos[0],area:'Artefactos'},{...QUIZZES.artefactos[2],area:'Artefactos'},
+  {...QUIZZES.artefactos[5],area:'Artefactos'},
+  // inspeccion (3)
+  {...QUIZZES.inspeccion[0],area:'Inspección'},{...QUIZZES.inspeccion[1],area:'Inspección'},
+  {...QUIZZES.inspeccion[4],area:'Inspección'},
+]; // Total: 4+3+3+3+3+3+3+3 = 25
+
+// ── INTERMEDIO: 50 preguntas (sin timer) ──
+const INTER_QUESTIONS = [
+  ...QUIZZES.normativa.slice(0,7).map(q=>({...q,area:'Normativa'})),      // 7
+  ...QUIZZES.materiales.slice(0,7).map(q=>({...q,area:'Materiales'})),    // 7
+  ...QUIZZES.ventilacion.slice(0,7).map(q=>({...q,area:'Ventilación'})),  // 7
+  ...QUIZZES.hermeticidad.slice(0,6).map(q=>({...q,area:'Hermeticidad'})),// 6
+  ...QUIZZES.seguridad.slice(0,6).map(q=>({...q,area:'Seguridad'})),      // 6
+  ...QUIZZES.calculos.slice(0,7).map(q=>({...q,area:'Cálculos'})),        // 7
+  ...QUIZZES.artefactos.slice(0,5).map(q=>({...q,area:'Artefactos'})),    // 5
+  ...QUIZZES.inspeccion.slice(0,5).map(q=>({...q,area:'Inspección'})),    // 5
+]; // Total: 7+7+7+6+6+7+5+5 = 50
+
+// ── SIMULACIÓN FINAL: 100 preguntas (CON timer 90 min) ──
+const SIM_QUESTIONS = [
+  ...QUIZZES.normativa.map(q=>({...q,area:'Normativa'})),
+  ...QUIZZES.materiales.map(q=>({...q,area:'Materiales'})),
+  ...QUIZZES.ventilacion.map(q=>({...q,area:'Ventilación'})),
+  ...QUIZZES.hermeticidad.map(q=>({...q,area:'Hermeticidad'})),
+  ...QUIZZES.seguridad.map(q=>({...q,area:'Seguridad'})),
+  ...QUIZZES.calculos.map(q=>({...q,area:'Cálculos'})),
+  ...QUIZZES.artefactos.map(q=>({...q,area:'Artefactos'})),
+  ...QUIZZES.inspeccion.map(q=>({...q,area:'Inspección'})),
+].slice(0,100); // 106 total, tomamos 100
+
+// ══════════════════════════════════════
+// NAVEGACIÓN
+// ══════════════════════════════════════
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map={
+    's-dash':0,'s-normativa':1,'s-materiales':2,'s-ventilacion':3,
+    's-hermeticidad':4,'s-seguridad':5,'s-calculos':6,'s-artefactos':7,
+    's-inspeccion':8,'s-evaluacion':8,'s-diagnostico':8,'s-simulacion':8,'s-intermedio':8,
+    's-glosario':9,'s-creditos':10
+  };
+  const btns=document.querySelectorAll('.nav-btn');
+  if(map[id]!==undefined) btns[map[id]]?.classList.add('active');
+
+  // mostrar contenido normativa
+  if(id==='s-normativa'){
+    document.getElementById('normativa-content').style.display='block';
+  }
+  window.scrollTo(0,0);
+  saveState();
+}
+
+// ══════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════
+function renderDash(){
+  const doneCount = Object.values(state.done).filter(Boolean).length;
+  const totalComps = COMPS.length;
+  document.getElementById('d-comp').textContent = `${doneCount}/${totalComps}`;
+  document.getElementById('d-hrs').textContent = `${Math.round(state.studyMinutes/60*10)/10}h`;
+  document.getElementById('d-streak').textContent = state.streak;
+  document.getElementById('xp-display').textContent = state.xp;
+  document.getElementById('streak-display').textContent = state.streak;
+  document.getElementById('d-exam').textContent = state.simScore !== null ? state.simScore+'%' : (state.diagScore !== null ? state.diagScore+'%' : '—');
+
+  const prob = Math.min(95, Math.round((doneCount/totalComps)*60 + (state.simScore||0)*0.4));
+  document.getElementById('d-prob').textContent = prob + '%';
+
+  if(state.diagScore!==null){
+    document.getElementById('diag-estado').textContent='✅ Completado · '+state.diagScore+'%';
+    document.getElementById('diag-estado2').textContent='✅ '+state.diagScore+'%';
+  }
+  if(state.interScore!==null){
+    document.getElementById('inter-estado').textContent='✅ Completado · '+state.interScore+'%';
+    document.getElementById('inter-estado2').textContent='✅ '+state.interScore+'%';
+  }
+  if(state.simScore!==null){
+    document.getElementById('sim-estado').textContent='✅ Completado · '+state.simScore+'%';
+    document.getElementById('sim-estado2').textContent='✅ '+state.simScore+'%';
+  }
+
+  // grid competencias
+  const grid=document.getElementById('comp-grid');
+  grid.innerHTML='';
+  COMPS.forEach(c=>{
+    const done=state.done[c.id];
+    const score=state.quizScores[c.id];
+    const pct=done?100:(score!=null?Math.round((score.correct/score.total)*100):0);
+    grid.innerHTML+=`
+      <div class="comp-row${done?' done-item':''}" onclick="goScreen('${c.screen}')">
+        <div class="comp-icon">${c.icon}</div>
+        <div class="comp-info">
+          <div class="comp-name">${c.name}</div>
+          <div class="comp-sub">${c.sub}</div>
+          <div class="comp-pct">${done?'✅ Completada':pct>0?pct+'% completado':'No iniciada'}</div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:${pct}%"></div></div>
+        </div>
+        <div class="comp-lock">${done?'✓':'›'}</div>
+      </div>`;
+  });
+}
+
+// ══════════════════════════════════════
+// QUIZ POR MÓDULO
+// ══════════════════════════════════════
+function renderModuleQuiz(moduleId){
+  const qs=QUIZZES[moduleId];
+  if(!qs||!document.getElementById('quiz-'+moduleId)) return;
+  const container=document.getElementById('quiz-'+moduleId);
+  container.innerHTML='';
+  qs.forEach((q,i)=>{
+    const opts=q.opts.map((o,j)=>`<button class="choice-btn" data-mod="${moduleId}" data-q="${i}" data-opt="${j}" onclick="pickAns(this,'${moduleId}',${i},${j},${q.ans})">${o}</button>`).join('');
+    container.innerHTML+=`
+      <div class="quiz-wrap">
+        <div class="quiz-num">Pregunta ${i+1} de ${qs.length}</div>
+        <div class="quiz-q">${q.q}</div>
+        <div class="choices" id="q-${moduleId}-${i}">${opts}</div>
+        <div class="feedback-box" id="fb-${moduleId}-${i}"></div>
+      </div>`;
+  });
+  // track answers
+  window['_ans_'+moduleId]=new Array(qs.length).fill(null);
+  window['_done_'+moduleId]=new Array(qs.length).fill(false);
+}
+
+function pickAns(btn,mod,qIdx,optIdx,correct){
+  if(window['_done_'+mod][qIdx]) return;
+  window['_ans_'+mod][qIdx]=optIdx;
+  // habilitar botón verificar si todas respondidas
+  const qs=QUIZZES[mod];
+  const allAnswered=window['_ans_'+mod].every(a=>a!==null);
+  if(allAnswered) document.getElementById('btn-check-'+mod).disabled=false;
+  // highlight seleccionado
+  document.querySelectorAll(`[data-mod="${mod}"][data-q="${qIdx}"]`).forEach(b=>b.style.borderColor='');
+  btn.style.borderColor='var(--accent)';
+}
+
+function checkQuiz(mod){
+  const qs=QUIZZES[mod];
+  let correct=0;
+  qs.forEach((q,i)=>{
+    const sel=window['_ans_'+mod][i];
+    const fb=document.getElementById(`fb-${mod}-${i}`);
+    document.querySelectorAll(`[data-mod="${mod}"][data-q="${i}"]`).forEach(b=>{
+      b.disabled=true;
+      const j=parseInt(b.dataset.opt);
+      if(j===q.ans) b.classList.add('correct');
+      else if(j===sel&&sel!==q.ans) b.classList.add('wrong');
+    });
+    if(sel===q.ans){
+      correct++;
+      fb.className='feedback-box ok';
+      fb.innerHTML='✓ Correcto<div class="feedback-detail">'+q.exp+'</div>';
+    } else {
+      fb.className='feedback-box bad';
+      fb.innerHTML='✗ Incorrecto<div class="feedback-detail">'+q.exp+'</div>';
+    }
+    window['_done_'+mod][i]=true;
+  });
+  const pct=Math.round((correct/qs.length)*100);
+  state.quizScores[mod]={correct,total:qs.length};
+  const xpGain=correct*10;
+  state.xp+=xpGain;
+  saveState();
+  const res=document.getElementById('result-'+mod);
+  res.style.display='block';
+  res.innerHTML=`
+    <div class="result-box">
+      <div class="result-score" style="color:${pct>=70?'var(--accent2)':'var(--accent3)'}">${pct}%</div>
+      <div class="result-label">${correct} de ${qs.length} correctas · +${xpGain} XP</div>
+      <div style="font-size:13px;color:var(--muted)">${pct>=70?'✅ Buen resultado. Puedes marcar esta competencia.':'⚠️ Repasa el contenido antes de continuar.'}</div>
+    </div>`;
+  document.getElementById('btn-check-'+mod).disabled=true;
+  showNotif(`+${xpGain} XP ganados ⚡`);
+}
+
+function markDone(mod){
+  state.done[mod]=true;
+  state.xp+=50;
+  const today=new Date().toDateString();
+  if(state.lastStudy!==today){
+    state.streak = state.lastStudy===new Date(Date.now()-86400000).toDateString() ? state.streak+1 : 1;
+    state.lastStudy=today;
+  }
+  saveState();
+  showNotif('✅ ¡Competencia completada! +50 XP');
+  renderDash();
+}
+
+// ══════════════════════════════════════
+// DIAGNÓSTICO
+// ══════════════════════════════════════
+function startDiagnostico(){
+  goScreen('s-diagnostico');
+  renderEval('diag',DIAG_QUESTIONS);
+}
+
+// ══════════════════════════════════════
+// EVALUACIÓN INTERMEDIA
+// ══════════════════════════════════════
+function startIntermedio(){
+  goScreen('s-intermedio');
+  renderEval('inter',INTER_QUESTIONS);
+}
+
+// ══════════════════════════════════════
+// SIMULACIÓN
+// ══════════════════════════════════════
+let simTimer=null;
+let simSeconds=5400;
+function startSimulacion(){
+  goScreen('s-simulacion');
+  renderEval('sim',SIM_QUESTIONS);
+  clearInterval(simTimer);
+  simSeconds=5400;
+  updateTimer();
+  simTimer=setInterval(()=>{
+    simSeconds--;
+    updateTimer();
+    if(simSeconds<=0){clearInterval(simTimer);submitEval('sim',SIM_QUESTIONS);}
+  },1000);
+}
+function updateTimer(){
+  const m=Math.floor(simSeconds/60),s=simSeconds%60;
+  const el=document.getElementById('timer-box');
+  if(el) el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if(simSeconds<=300&&el) el.style.color='var(--danger)';
+}
+
+function renderEval(prefix,questions){
+  const container=document.getElementById(prefix+'-quiz-container');
+  container.innerHTML='';
+  window['_eval_ans_'+prefix]=new Array(questions.length).fill(null);
+  questions.forEach((q,i)=>{
+    const opts=q.opts.map((o,j)=>`<button class="choice-btn" onclick="pickEvalAns('${prefix}',${i},${j})" id="eval-${prefix}-${i}-${j}">${o}</button>`).join('');
+    container.innerHTML+=`
+      <div class="quiz-wrap">
+        <div class="quiz-num">Pregunta ${i+1} de ${questions.length}${q.area?' · '+q.area:''}</div>
+        <div class="quiz-q">${q.q}</div>
+        <div class="choices">${opts}</div>
+      </div>`;
+  });
+  container.innerHTML+=`<button class="btn btn-primary" onclick="submitEval('${prefix}',window._evalQs_${prefix})" style="margin-bottom:24px">Enviar respuestas →</button>`;
+  window['_evalQs_'+prefix]=questions;
+}
+
+function pickEvalAns(prefix,qIdx,optIdx){
+  window['_eval_ans_'+prefix][qIdx]=optIdx;
+  const qs=window['_evalQs_'+prefix];
+  for(let j=0;j<qs[qIdx].opts.length;j++){
+    const b=document.getElementById(`eval-${prefix}-${qIdx}-${j}`);
+    if(b) b.style.borderColor = j===optIdx?'var(--accent)':'';
+  }
+}
+
+function submitEval(prefix,questions){
+  clearInterval(simTimer);
+  const answers=window['_eval_ans_'+prefix]||[];
+  const qs=questions||window['_evalQs_'+prefix]||[];
+  let correct=0;
+  const areaScores={};
+  qs.forEach((q,i)=>{
+    const area=q.area||'General';
+    if(!areaScores[area]) areaScores[area]={c:0,t:0};
+    areaScores[area].t++;
+    if(answers[i]===q.ans){correct++;areaScores[area].c++;}
+  });
+  const pct=Math.round((correct/qs.length)*100);
+
+  if(prefix==='diag') state.diagScore=pct;
+  else if(prefix==='inter') state.interScore=pct;
+  else state.simScore=pct;
+  state.xp+=pct;
+  saveState();
+
+  const container=document.getElementById(prefix+'-quiz-container');
+  container.innerHTML='';
+  const res=document.getElementById(prefix+'-result');
+  res.style.display='block';
+
+  const areaHtml=Object.entries(areaScores).map(([a,s])=>`
+    <div class="result-item">
+      <div class="result-item-val" style="color:${s.c/s.t>=0.7?'var(--accent2)':'var(--accent3)'}">${Math.round(s.c/s.t*100)}%</div>
+      <div class="result-item-lbl">${a}</div>
+    </div>`).join('');
+
+  const rec = pct>=80?'Excelente preparación. Estás listo para la evaluación oficial.'
+    :pct>=60?'Buen nivel. Refuerza las áreas bajo 70% antes de presentarte.'
+    :'Necesitas más preparación. Repasa todos los módulos y vuelve a intentarlo.';
+
+  res.innerHTML=`
+    <div class="result-box">
+      <div class="result-score" style="color:${pct>=70?'var(--accent2)':pct>=50?'var(--accent3)':'var(--danger)'}">${pct}%</div>
+      <div class="result-label">${correct} de ${qs.length} correctas</div>
+      <div style="margin-bottom:14px">
+        <span class="tag ${pct>=70?'tag-green':pct>=50?'tag-amber':'tag-red'}">${pct>=70?'Aprobado':'Por mejorar'}</span>
+        <span class="tag tag-blue">+${pct} XP</span>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">${rec}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Resultados por área</div>
+      <div class="result-grid">${areaHtml}</div>
+    </div>
+    <button class="btn btn-outline" onclick="goScreen('s-dash');renderDash()" style="margin-top:4px">← Volver al inicio</button>`;
+  renderDash();
+}
+
+// ══════════════════════════════════════
+// GLOSARIO
+// ══════════════════════════════════════
+const GLOSARIO = [
+  {t:'DS N°66',d:'Decreto Supremo N°66 del Ministerio de Economía. Regula todas las instalaciones interiores de gas y medidores en Chile. Es la norma principal que rige la actividad de los instaladores de gas.'},
+  {t:'SEC',d:'Superintendencia de Electricidad y Combustibles. Organismo del Estado que regula, fiscaliza y certifica a los instaladores de gas. Emite las licencias de habilitación y supervisa el cumplimiento del DS N°66.'},
+  {t:'ChileValora',d:'Sistema Nacional de Certificación de Competencias Laborales. Organismo que evalúa y certifica las competencias prácticas y teóricas de los instaladores de gas, habilitándolos para obtener la licencia SEC.'},
+  {t:'UA (Unidad de Artefacto)',d:'Unidad estándar de consumo de gas de un artefacto. Determina el diámetro mínimo de tubería necesario. Ejemplo: cocina = 1 UA, calefón 14L = 2 UA, calefactor 6.000 kcal/h = 1 UA.'},
+  {t:'GLP',d:'Gas Licuado de Petróleo. Mezcla de propano y butano, almacenada en cilindros o estanques. Más pesado que el aire: en caso de fuga se acumula en zonas bajas. Requiere rejillas de ventilación en parte baja.'},
+  {t:'Gas Natural',d:'Gas combustible compuesto principalmente de metano. Más liviano que el aire: en caso de fuga sube. Se distribuye por red de cañerías. Detectores de gas natural deben instalarse en parte alta del recinto.'},
+  {t:'Hermeticidad',d:'Prueba obligatoria que verifica que la instalación no tiene fugas. Requisito: mínimo 300 mm.c.a. de presión sostenida durante 30 minutos con artefactos desconectados. Se usa aire comprimido, no gas.'},
+  {t:'mm.c.a.',d:'Milímetros de Columna de Agua. Unidad de presión usada en instalaciones de gas de baja presión. 1 mm.c.a. equivale a la presión ejercida por una columna de agua de 1 mm de altura (≈ 9,8 Pa).'},
+  {t:'Tiraje Natural',d:'Sistema de evacuación de gases de combustión por convección térmica. Los gases calientes ascienden por un ducto vertical hasta salir al exterior. No permite ductos horizontales. El más común en instalaciones antiguas.'},
+  {t:'Tiraje Forzado',d:'Sistema de evacuación de gases que usa un ventilador mecánico para expulsar los gases al exterior. Permite ductos horizontales. Común en calefones y calderas modernas de alta eficiencia.'},
+  {t:'Cámara Estanca',d:'Sistema de combustión sellado (tiro balanceado). El artefacto toma el aire para la combustión directamente del exterior y expulsa los gases también al exterior, sin contacto con el aire interior. El más seguro. Único permitido en baños.'},
+  {t:'CO (Monóxido de Carbono)',d:'Gas inodoro, incoloro y altamente tóxico producido por combustión incompleta de gas (cuando falta oxígeno). Puede causar intoxicación y muerte. Principal peligro en recintos con artefactos a gas sin ventilación adecuada.'},
+  {t:'NCh',d:'Norma Chilena. Normas técnicas elaboradas por el INN (Instituto Nacional de Normalización). Las NCh complementan el DS N°66 estableciendo especificaciones técnicas para materiales, ensayos y procedimientos.'},
+  {t:'RNII',d:'Registro Nacional de Instaladores e Instalaciones. Base de datos administrada por la SEC que contiene todos los instaladores habilitados y las instalaciones certificadas en Chile. Consultable en wlhttp.sec.cl/rnii/.'},
+  {t:'Unión Dieléctrica',d:'Accesorio obligatorio cuando se unen tuberías de materiales distintos (cobre con acero, por ejemplo). Evita la corrosión galvánica que ocurre al poner en contacto dos metales diferentes con el electrolito del ambiente.'},
+  {t:'Polietileno (PE)',d:'Material de tubería autorizado SOLO para instalaciones de gas enterradas. Está PROHIBIDO en instalaciones interiores. No soporta las condiciones mecánicas y de temperatura de los recintos interiores.'},
+  {t:'Portfolio de Evidencias',d:'Conjunto de documentos que el candidato a la evaluación ChileValora debe presentar para acreditar su experiencia laboral: certificados de empleadores, órdenes de trabajo, fotos de instalaciones, registros de capacitación, etc.'},
+  {t:'Válvula General',d:'Llave de corte principal de la instalación, instalada a la entrada del suministro. Debe estar siempre visible y accesible sin herramientas. Es la primera que se cierra en caso de emergencia por fuga de gas.'},
+  {t:'Vaina Protectora',d:'Tubería de mayor diámetro que rodea y protege la tubería de gas en su paso por muros, losas o estructuras. Obligatoria en todos los pasos de muro. Protege de daños mecánicos y permite reemplazar la tubería sin demoler.'},
+  {t:'Factor de Simultaneidad',d:'Factor que permite reducir el caudal de diseño total de una instalación, considerando que no todos los artefactos funcionan al mismo tiempo. Se aplica en instalaciones con muchos artefactos para no sobredimensionar las tuberías.'},
+];
+
+function renderGlosario(){
+  const el=document.getElementById('glosario-list');
+  if(!el) return;
+  el.innerHTML=GLOSARIO.map(g=>`
+    <div class="glosario-item">
+      <div class="glosario-term">${g.t}</div>
+      <div class="glosario-def">${g.d}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════
+// NOTIFICACIÓN
+// ══════════════════════════════════════
+function showNotif(msg){
+  const n=document.getElementById('notif');
+  n.textContent=msg;
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+// ══════════════════════════════════════
+// LISTA DE LECCIONES POR MÓDULO
+// ══════════════════════════════════════
+function renderLessonsNav(){
+  const ll=document.getElementById('ll-normativa');
+  if(ll) ll.innerHTML=[
+    {n:'¿Qué es el DS N°66?',s:'Marco legal y obligaciones'},
+    {n:'Tipos de licencias SEC',s:'Clase 1 a 4 — alcances y UA'},
+    {n:'Ruta hacia la certificación',s:'Pasos desde la experiencia a la licencia'},
+    {n:'Responsabilidades del instalador',s:'Infracciones y consecuencias'},
+  ].map((l,i)=>`<div class="lesson-item ${state.done['normativa']?'done-item':''}" onclick="document.getElementById('normativa-content').scrollIntoView({behavior:'smooth'})">
+    <div class="li-num ${state.done['normativa']?'done':''}">${state.done['normativa']?'✓':i+1}</div>
+    <div class="li-info"><div class="li-name">${l.n}</div><div class="li-sub">${l.s}</div></div>
+    <div class="li-check">${state.done['normativa']?'✅':'›'}</div>
+  </div>`).join('');
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+loadState();
+renderDash();
+renderLessonsNav();
+renderGlosario();
+// render todos los quizzes
+Object.keys(QUIZZES).forEach(m=>{
+  setTimeout(()=>renderModuleQuiz(m),100);
+});
+
+// Actualizar racha
+const today=new Date().toDateString();
+if(state.lastStudy!==today){
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if(state.lastStudy!==yesterday) state.streak=0;
+}
+
+// Guardar cada 2 min
+setInterval(saveState, 120000);
+</script>
+</body>
+</html>
