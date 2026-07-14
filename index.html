@@ -279,19 +279,19 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <div class="eval-icon">🩺</div>
     <div class="eval-title">Diagnóstico Inicial</div>
     <div class="eval-desc">Identifica tus fortalezas y debilidades antes de comenzar. Recibe una ruta personalizada de estudio.</div>
-    <div class="eval-meta"><span>25 preguntas</span><span>·</span><span>Sin límite de tiempo</span><span>·</span><span id="diag-estado">No realizado</span></div>
+    <div class="eval-meta"><span>15 preguntas</span><span>·</span><span>Sin límite de tiempo</span><span>·</span><span id="diag-estado">No realizado</span></div>
   </div>
   <div class="eval-card" onclick="startIntermedio()">
     <div class="eval-icon">📊</div>
     <div class="eval-title">Evaluación Intermedia</div>
-    <div class="eval-desc">Mide tu progreso después de estudiar los módulos. 50 preguntas con retroalimentación inmediata.</div>
-    <div class="eval-meta"><span>50 preguntas</span><span>·</span><span>Sin límite de tiempo</span><span>·</span><span id="inter-estado">No realizado</span></div>
+    <div class="eval-desc">Mide tu progreso después de estudiar los módulos. 25 preguntas con retroalimentación inmediata.</div>
+    <div class="eval-meta"><span>25 preguntas</span><span>·</span><span>Sin límite de tiempo</span><span>·</span><span id="inter-estado">No realizado</span></div>
   </div>
   <div class="eval-card" onclick="startSimulacion()">
     <div class="eval-icon">🏆</div>
     <div class="eval-title">Simulación Final</div>
-    <div class="eval-desc">Simula la evaluación oficial ChileValora. 100 preguntas sin ayuda con cronómetro de 90 minutos.</div>
-    <div class="eval-meta"><span>100 preguntas</span><span>·</span><span>90 minutos</span><span>·</span><span id="sim-estado">No realizado</span></div>
+    <div class="eval-desc">Simula la evaluación oficial ChileValora. 50 preguntas sin ayuda con cronómetro de 45 minutos.</div>
+    <div class="eval-meta"><span>50 preguntas</span><span>·</span><span>45 minutos</span><span>·</span><span id="sim-estado">No realizado</span></div>
   </div>
 
 </div>
@@ -946,21 +946,21 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <div class="eval-icon">🩺</div>
     <div class="eval-title">Diagnóstico Inicial</div>
     <div class="eval-desc">Identifica tus fortalezas y debilidades. Recibe ruta personalizada. Recomendado antes de comenzar el estudio.</div>
-    <div class="eval-meta"><span>25 preguntas</span><span>·</span><span>Todas las áreas</span><span>·</span><span id="diag-estado2">No realizado</span></div>
+    <div class="eval-meta"><span>15 preguntas</span><span>·</span><span>Todas las áreas</span><span>·</span><span id="diag-estado2">No realizado</span></div>
   </div>
 
   <div class="eval-card" onclick="startIntermedio()">
     <div class="eval-icon">📊</div>
     <div class="eval-title">Evaluación Intermedia</div>
     <div class="eval-desc">Mide tu avance a mitad del estudio. Retroalimentación inmediata por área. Sin cronómetro.</div>
-    <div class="eval-meta"><span>50 preguntas</span><span>·</span><span>Sin tiempo</span><span>·</span><span id="inter-estado2">No realizado</span></div>
+    <div class="eval-meta"><span>25 preguntas</span><span>·</span><span>Sin tiempo</span><span>·</span><span id="inter-estado2">No realizado</span></div>
   </div>
 
   <div class="eval-card" onclick="startSimulacion()">
     <div class="eval-icon">🏆</div>
     <div class="eval-title">Simulación Final</div>
-    <div class="eval-desc">100 preguntas sin ayuda. Cronómetro de 90 minutos. Condiciones reales de la evaluación ChileValora.</div>
-    <div class="eval-meta"><span>100 preguntas</span><span>·</span><span>90 minutos</span><span>·</span><span id="sim-estado2">No realizado</span></div>
+    <div class="eval-desc">50 preguntas sin ayuda. Cronómetro de 45 minutos. Condiciones reales de la evaluación ChileValora.</div>
+    <div class="eval-meta"><span>50 preguntas</span><span>·</span><span>45 minutos</span><span>·</span><span id="sim-estado2">No realizado</span></div>
   </div>
 </div>
 
@@ -970,7 +970,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div class="screen" id="s-diagnostico">
   <button class="back-btn" onclick="goScreen('s-evaluacion')">← Volver a evaluaciones</button>
   <div style="font-size:20px;font-weight:900;margin-bottom:4px">🩺 Diagnóstico Inicial</div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">25 preguntas · Todas las áreas · Sin límite de tiempo</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">15 preguntas · Todas las áreas · Sin límite de tiempo</div>
   <div id="diag-quiz-container"></div>
   <div id="diag-result" style="display:none"></div>
 </div>
@@ -981,7 +981,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div class="screen" id="s-intermedio">
   <button class="back-btn" onclick="goScreen('s-evaluacion')">← Volver a evaluaciones</button>
   <div style="font-size:20px;font-weight:900;margin-bottom:4px">📊 Evaluación Intermedia</div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">50 preguntas · Todas las áreas · Sin límite de tiempo</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">25 preguntas · Todas las áreas · Sin límite de tiempo</div>
   <div id="inter-quiz-container"></div>
   <div id="inter-result" style="display:none"></div>
 </div>
@@ -994,7 +994,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
     <div>
       <div style="font-size:20px;font-weight:900">🏆 Simulación Final</div>
-      <div style="font-size:12px;color:var(--muted)">100 preguntas · Sin ayudas · Condiciones reales</div>
+      <div style="font-size:12px;color:var(--muted)">50 preguntas · Sin ayudas · Condiciones reales</div>
     </div>
     <div id="timer-box" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent3)">90:00</div>
   </div>
@@ -1281,7 +1281,7 @@ const QUIZZES = {
   ],
 };
 
-// ── DIAGNÓSTICO: 25 preguntas (sin timer) ──
+// ── DIAGNÓSTICO: 15 preguntas (sin timer) ──
 const DIAG_QUESTIONS = [
   // normativa (4)
   {...QUIZZES.normativa[0],area:'Normativa'},{...QUIZZES.normativa[3],area:'Normativa'},
@@ -1309,7 +1309,7 @@ const DIAG_QUESTIONS = [
   {...QUIZZES.inspeccion[4],area:'Inspección'},
 ]; // Total: 4+3+3+3+3+3+3+3 = 25
 
-// ── INTERMEDIO: 50 preguntas (sin timer) ──
+// ── INTERMEDIO: 25 preguntas (sin timer) ──
 const INTER_QUESTIONS = [
   ...QUIZZES.normativa.slice(0,7).map(q=>({...q,area:'Normativa'})),      // 7
   ...QUIZZES.materiales.slice(0,7).map(q=>({...q,area:'Materiales'})),    // 7
@@ -1321,7 +1321,7 @@ const INTER_QUESTIONS = [
   ...QUIZZES.inspeccion.slice(0,5).map(q=>({...q,area:'Inspección'})),    // 5
 ]; // Total: 7+7+7+6+6+7+5+5 = 50
 
-// ── SIMULACIÓN FINAL: 100 preguntas (CON timer 90 min) ──
+// ── SIMULACIÓN FINAL: 50 preguntas (CON timer 90 min) ──
 const SIM_QUESTIONS = [
   ...QUIZZES.normativa.map(q=>({...q,area:'Normativa'})),
   ...QUIZZES.materiales.map(q=>({...q,area:'Materiales'})),
@@ -1791,5 +1791,34 @@ setInterval(saveState, 120000);
   });
 })();
 </script>
+
+<script>
+/* ══ ACTUALIZACIÓN 14-jul-2026 · Registro:
+   - Evaluaciones ALEATORIAS y MEZCLADAS desde el banco completo:
+     Diagnóstico 15 · Intermedio 25 · Simulación 50 (cronómetro 45 min)
+   - Nuevo MODO TRIVIA 🎮: todo el banco, de a una, racha, 3 vidas,
+     puntaje con bonus por racha y récord guardado en el dispositivo. ══ */
+(function(){
+function shuffleQ(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const x=a[i];a[i]=a[j];a[j]=x;}return a;}
+const AREAS={normativa:'Normativa',materiales:'Materiales',ventilacion:'Ventilación',hermeticidad:'Hermeticidad',seguridad:'Seguridad',calculos:'Cálculos',artefactos:'Artefactos',inspeccion:'Inspección'};
+const ALLQ=[];Object.keys(QUIZZES).forEach(k=>QUIZZES[k].forEach(q=>ALLQ.push(Object.assign({},q,{area:AREAS[k]||k}))));
+window.startDiagnostico=function(){goScreen('s-diagnostico');renderEval('diag',shuffleQ(ALLQ).slice(0,15));};
+window.startIntermedio=function(){goScreen('s-intermedio');renderEval('inter',shuffleQ(ALLQ).slice(0,25));};
+window.startSimulacion=function(){goScreen('s-simulacion');renderEval('sim',shuffleQ(ALLQ).slice(0,50));clearInterval(simTimer);simSeconds=2700;updateTimer();simTimer=setInterval(function(){simSeconds--;updateTimer();if(simSeconds<=0){clearInterval(simTimer);submitEval('sim',window['_evalQs_sim']);}},1000);};
+let tDeck=[],tIdx=0,tScore=0,tStreak=0,tBest=0,tLives=3;
+try{tBest=parseInt(localStorage.getItem('rutasec_trivia_best')||'0');}catch(e){}
+function triviaCard(){return '<div class="eval-card" onclick="startTrivia()"><div style="font-size:15px;font-weight:700;margin-bottom:4px">🎮 Modo Trivia</div><div class="eval-desc">Todo el banco ('+ALLQ.length+' preguntas), de a una, con racha 🔥 y 3 vidas. Récord: <span class="trivia-best">'+tBest+'</span> pts.</div><div class="eval-meta"><span>'+ALLQ.length+' preguntas</span><span>·</span><span>1 a la vez</span><span>·</span><span>3 vidas ❤️</span></div></div>';}
+['sim-estado','sim-estado2'].forEach(function(id){const el=document.getElementById(id);if(el){const card=el.closest('.eval-card');if(card)card.insertAdjacentHTML('afterend',triviaCard());}});
+const scr=document.createElement('div');scr.className='screen';scr.id='s-trivia';scr.innerHTML='<button class="back-btn" onclick="goScreen(\'s-dash\');renderDash()">← Volver</button><div id="trivia-hud" style="display:flex;gap:10px;justify-content:space-between;font-size:13px;margin-bottom:12px;flex-wrap:wrap"></div><div id="trivia-box"></div>';
+const anyScreen=document.querySelector('.screen');if(anyScreen)anyScreen.parentElement.appendChild(scr);
+window.startTrivia=function(){tDeck=shuffleQ(ALLQ);tIdx=0;tScore=0;tStreak=0;tLives=3;goScreen('s-trivia');tRound();};
+function tHud(){document.getElementById('trivia-hud').innerHTML='<span>❓ '+Math.min(tIdx+1,tDeck.length)+'/'+tDeck.length+'</span><span>🔥 Racha: '+tStreak+'</span><span>⭐ '+tScore+' pts</span><span>'+'❤️'.repeat(Math.max(tLives,0))+'</span>';}
+function tRound(){if(tIdx>=tDeck.length||tLives<=0){tEnd();return;}tHud();const q=tDeck[tIdx];document.getElementById('trivia-box').innerHTML='<div class="quiz-wrap"><div class="quiz-num">'+q.area+'</div><div class="quiz-q">'+q.q+'</div><div class="choices" id="t-choices">'+q.opts.map(function(o,j){return '<button class="choice-btn" style="margin-bottom:8px" onclick="tPick('+j+')">'+o+'</button>';}).join('')+'</div><div id="t-exp" style="display:none;margin-top:10px;font-size:13px;color:var(--muted);line-height:1.6"></div><button class="btn btn-primary" id="t-next" style="display:none;margin-top:12px" onclick="tNext()">Siguiente →</button></div>';}
+window.tPick=function(j){const q=tDeck[tIdx];const btns=document.querySelectorAll('#t-choices .choice-btn');btns.forEach(function(b,i){b.disabled=true;if(i===q.ans)b.style.cssText+=';background:rgba(80,200,120,.25);border-color:#50c878';else if(i===j)b.style.cssText+=';background:rgba(220,80,80,.25);border-color:#dc5050';});const exp=document.getElementById('t-exp');exp.style.display='block';if(j===q.ans){tStreak++;tScore+=10+Math.min(tStreak,5)*2;exp.innerHTML='✅ <b>¡Correcto!</b> '+(tStreak>=3?'🔥 ¡Racha de '+tStreak+'!':'')+'<br>'+q.exp;}else{tStreak=0;tLives--;exp.innerHTML='❌ <b>La correcta era: '+q.opts[q.ans]+'</b><br>'+q.exp;}tHud();document.getElementById('t-next').style.display='block';};
+window.tNext=function(){tIdx++;tRound();};
+function tEnd(){let medal='⭐',msg='¡Sigue practicando!';if(tLives>0&&tIdx>=tDeck.length){medal='🏆';msg='¡Completaste TODO el banco!';}else if(tScore>=500){medal='🥇';msg='¡Nivel instalador!';}else if(tScore>=250){medal='🥈';msg='¡Muy bien!';}if(tScore>tBest){tBest=tScore;try{localStorage.setItem('rutasec_trivia_best',String(tBest));}catch(e){}msg+=' 🎉 ¡NUEVO RÉCORD!';}document.querySelectorAll('.trivia-best').forEach(function(el){el.textContent=tBest;});document.getElementById('trivia-box').innerHTML='<div class="card" style="text-align:center;padding:26px"><div style="font-size:52px">'+medal+'</div><div style="font-size:22px;font-weight:800;margin:6px 0">'+tScore+' puntos</div><div style="font-size:14px;color:var(--muted);margin-bottom:6px">'+tIdx+' preguntas jugadas · récord: '+tBest+'</div><div style="font-size:14px;margin-bottom:16px">'+msg+'</div><button class="btn btn-primary" onclick="startTrivia()">🔁 Jugar de nuevo</button><button class="btn btn-outline" style="margin-top:8px" onclick="goScreen(\'s-dash\');renderDash()">← Volver al inicio</button></div>';tHud();}
+})();
+</script>
 </body>
+
 </html>
