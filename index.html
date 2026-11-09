@@ -1819,6 +1819,78 @@ window.tNext=function(){tIdx++;tRound();};
 function tEnd(){let medal='⭐',msg='¡Sigue practicando!';if(tLives>0&&tIdx>=tDeck.length){medal='🏆';msg='¡Completaste TODO el banco!';}else if(tScore>=500){medal='🥇';msg='¡Nivel instalador!';}else if(tScore>=250){medal='🥈';msg='¡Muy bien!';}if(tScore>tBest){tBest=tScore;try{localStorage.setItem('rutasec_trivia_best',String(tBest));}catch(e){}msg+=' 🎉 ¡NUEVO RÉCORD!';}document.querySelectorAll('.trivia-best').forEach(function(el){el.textContent=tBest;});document.getElementById('trivia-box').innerHTML='<div class="card" style="text-align:center;padding:26px"><div style="font-size:52px">'+medal+'</div><div style="font-size:22px;font-weight:800;margin:6px 0">'+tScore+' puntos</div><div style="font-size:14px;color:var(--muted);margin-bottom:6px">'+tIdx+' preguntas jugadas · récord: '+tBest+'</div><div style="font-size:14px;margin-bottom:16px">'+msg+'</div><button class="btn btn-primary" onclick="startTrivia()">🔁 Jugar de nuevo</button><button class="btn btn-outline" style="margin-top:8px" onclick="goScreen(\'s-dash\');renderDash()">← Volver al inicio</button></div>';tHud();}
 })();
 </script>
+<script>
+/* RutaSEC gratis y Pro (2026-11-09).
+   Gratis: inicio, Normativa, Materiales, diagnóstico de 15 preguntas, glosario y créditos.
+   Pro (código de activación): Ventilación, Hermeticidad, Seguridad, Cálculos, Artefactos, Inspección,
+   evaluación intermedia (25), simulación (50 en 45 min) y Modo Trivia. Los códigos no están aquí: solo su huella. */
+(function(){
+ var PRO={key:'rutasec_pro',salt:'rutasec-pro-2026:',precio:'$9.990',compra:'',correo:'johanna.ttorres@gmail.com',hashes:["14f5225d4c646ad99d66", "bbcabe011242cfa74826", "9d32d7bb891a9adef32d", "ce6ebf17b7c32bd2f537", "15e21a93b9b7992158b9", "8a1782c6597202c7c4cf", "dcff773b333417a5cbc1", "190cc0bf8b1a2563cfb5", "5a8e233a009426c8b63f", "f2ca88eb20ef21af5b35", "bb7fa464f76ac3e2216f", "147aa42742bd86bfd2ad", "d71d08fb642d405e43ac", "177a9bfe5086dd241f8c", "4dd73fbc2f6671d57682", "b4e5b6053d0e5f15b75b", "d2c48e1a5669b1b069c1", "b4071eff0ba4137ef94e", "40720cfa542434c5b976", "950babb8c890f50a1f4e", "0ca3d4c9af7beb4d0a44", "96f4214053abd1422436", "90cfd5875408b714304b", "4aa0d70223f3ff585c0b", "213610d73adab7dbcdc2", "b7b523f511aecaef4aa6", "c77166983d78a1eb199b", "30f9545259f2fddfcaac", "6a73466a96cb0a05ee06", "d95f7f6743c4679bb287", "87b7effbf62cda1bb7e5", "eaf01b8b1559d5b0e74b", "afb2de439265b1080965", "2913e9893e16f415cff7", "2b5c37335d7707257b01", "5971d6f9fa14672e79e3", "5354b9970f8d0839a4bb", "30ee4d10caee3974a45f", "f2bc0f93d5315cdbbe46", "8f7b95e62c1490176f1f", "0b65c470c083df0b3eb0", "8064a9922ffd0d2952f0", "195f38506deff559dc3d", "0106f297734829e078a0", "d0552e67a56e6997c4b4", "960cb6fd809e31820a50", "797242f921c7040c35c1", "01202b4999450ce0ef36", "859f32716a5a257eee63", "4d9525f3eb7141569919", "f153259f8a8dd9ffb961", "a2a0c88dafd84b813f1d", "fbb5af2b62a54232b190", "4354124ebb974e0a2bd6", "1ffd3650a2c50778957b", "313696f23db2350291d4", "83665bc7764d6e4d8233", "2ec8c63c5ab20d7f3dd3", "d8a87c625073aa9bff2f", "580ab1f9dd88239f38bc", "8cc82de043f7549d1fa6", "5955aa17fed663411333", "84aecb87d8522feb8d41", "71d85d26325b8f15e6ae", "7405dedbfea5f2d79fb8", "67a6181e8bb2018bbef8", "5a7dfd6b360f2c9c2993", "03a078cecaa067e15350", "521fbbeed37cc9875146", "2f0e722be75c83db87e0", "2b89f3db11b726bccfce", "82b0a550de13e17d1980", "8721c9f18a47a97a5179", "576563a63b8d39f69ae9", "6aabdf433164c8e64f8a", "b473cbbeda2932bbb476", "618ea7a9f04f4b3d9f21", "47a7cf6d21c6ad4a747d", "c59029a6efae1bf4781f", "85dd15f577b218de6865", "db5f32273a1872be2d40", "045733efb023652b6c1b", "d7963297443984eba1cc", "4a4098ffd1531d41fd3f", "27da8a1bf24a28c1bbda", "2fd54db00dc4df58b5d5", "5a4fd249d8150df8579f", "0ff65a6106908d6daa44", "43d5a725c9fc321a4d54", "eb76dbfe97e33bd7bebc", "e792441a59b063afad0b", "3655f40f43b4ec9522f9", "2864f1ce18120a44581f", "0521d59971735246f553", "3e27ac7d3c3ae0e8481e", "4f0c7c35d41e634c0964", "c1f7745ee1e719f6754e", "60a43848ae7fc01c3fcb", "d6f459d5cd10b2815bfc", "ae5c476a7324faa9bad8"]};
+ var NOMBRES={'s-ventilacion':'El módulo Ventilación','s-hermeticidad':'El módulo Hermeticidad','s-seguridad':'El módulo Seguridad','s-calculos':'El módulo Cálculos','s-artefactos':'El módulo Artefactos','s-inspeccion':'El módulo Inspección','s-intermedio':'La evaluación intermedia','s-simulacion':'La simulación de examen','s-trivia':'El Modo Trivia'};
+ var NAVS={'nav-ventilacion':1,'nav-hermeticidad':1,'nav-seguridad':1,'nav-calculos':1,'nav-artefactos':1};
+ function norm(c){return String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
+ function hex(buf){return Array.prototype.map.call(new Uint8Array(buf),function(x){return ('0'+x.toString(16)).slice(-2)}).join('')}
+ function esPro(){try{return localStorage.getItem(PRO.key)==='1'}catch(e){return false}}
+ window.esProSEC=esPro;
+ function activar(c){
+  if(!(window.crypto&&crypto.subtle&&window.TextEncoder)) return Promise.resolve(false);
+  return crypto.subtle.digest('SHA-256',new TextEncoder().encode(PRO.salt+norm(c))).then(function(b){
+   var ok=PRO.hashes.indexOf(hex(b).slice(0,20))>=0; if(ok){try{localStorage.setItem(PRO.key,'1')}catch(e){}} return ok;});
+ }
+ var css=document.createElement('style');
+ css.textContent='.pro-card{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--accent3);border-radius:var(--radius);padding:20px;margin-bottom:14px}.pro-card h2{font-size:20px;margin:6px 0 8px}.pro-card ul{margin:8px 0 14px 18px;padding:0;line-height:1.7;color:var(--text)}.pro-in{display:flex;gap:8px;flex-wrap:wrap}.pro-in input{flex:1 1 180px;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);text-transform:uppercase}.pro-in .btn{width:auto}.pro-muted{color:var(--muted);font-size:13px;line-height:1.6}.pro-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#0d0f14;background:var(--accent3);border-radius:20px;padding:3px 10px}';
+ document.head.appendChild(css);
+ var INCLUYE=['Los 6 módulos restantes: Ventilación, Hermeticidad, Seguridad, Cálculos, Artefactos e Inspección','Evaluación intermedia de 25 preguntas','Simulación de examen: 50 preguntas en 45 minutos','Modo Trivia con todo el banco de 106 preguntas'];
+ function tarjeta(motivo){
+  if(esPro()) return '<div class="pro-card"><span class="pro-badge">Pro activo</span><h2>✅ Tienes RutaSEC Pro</h2><p class="pro-muted">Todo está desbloqueado en este equipo.</p><button class="btn btn-primary" onclick="goScreen(\'s-dash\');renderDash()">🏠 Ir al inicio</button></div>';
+  return '<div class="pro-card"><span class="pro-badge">RutaSEC Pro</span><h2>'+(motivo?motivo+' es parte de RutaSEC Pro':'Desbloquea RutaSEC Pro')+'</h2>'+
+   '<p>Todo lo que necesitas para la certificación Clase 3, por <b>'+PRO.precio+'</b>, pago único.</p><ul>'+INCLUYE.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>'+
+   '<div class="pro-in"><input id="sec-procode" type="text" autocomplete="off" autocapitalize="characters" placeholder="RS-XXXX-XXXX" aria-label="Código RutaSEC Pro"><button class="btn btn-primary" type="button" data-secpro-act>Activar</button></div>'+
+   '<p id="sec-promsg" class="pro-muted" style="min-height:1.6em;margin-top:8px" aria-live="polite"></p>'+
+   '<div class="sec-title" style="margin-top:6px">¿Cómo consigo mi código?</div>'+
+   (PRO.compra?'<p><a class="btn btn-primary" href="'+PRO.compra+'" target="_blank" rel="noopener">⭐ Comprar RutaSEC Pro</a></p>':'')+
+   '<p class="pro-muted">Escríbenos a <b style="user-select:all;color:var(--text)">'+PRO.correo+'</b> y te enviamos tu código. Si tu instituto usa RutaSEC, pídeselo a tu instituto.</p></div>';
+ }
+ var scr=document.createElement('div'); scr.className='screen'; scr.id='s-pro';
+ scr.innerHTML='<button class="back-btn" onclick="goScreen(\'s-dash\');renderDash()">← Volver al inicio</button><div id="pro-box"></div>';
+ var any=document.querySelector('.screen'); if(any) any.parentElement.appendChild(scr);
+ var _go=window.goScreen;
+ window.goScreen=function(id){
+  if(!esPro()&&NOMBRES[id]){ _go('s-pro'); document.getElementById('pro-box').innerHTML=tarjeta(NOMBRES[id]); return; }
+  if(id==='s-pro'){ document.getElementById('pro-box').innerHTML=tarjeta(''); }
+  return _go(id);
+ };
+ ['startIntermedio','startSimulacion','startTrivia'].forEach(function(f){
+  var orig=window[f]; if(typeof orig!=='function') return;
+  window[f]=function(){ if(!esPro()){ var id=f==='startIntermedio'?'s-intermedio':f==='startSimulacion'?'s-simulacion':'s-trivia'; return window.goScreen(id); } return orig.apply(this,arguments); };
+ });
+ function pintarNav(){
+  var nav=document.getElementById('main-nav');
+  if(nav&&!document.getElementById('nav-pro')){ var b=document.createElement('button'); b.className='nav-btn'; b.id='nav-pro'; b.textContent='⭐ Pro'; b.onclick=function(){window.goScreen('s-pro')}; nav.appendChild(b); }
+  Object.keys(NAVS).forEach(function(id){ var el=document.getElementById(id); if(!el) return; var t=el.textContent.replace(' 🔒',''); el.textContent=esPro()?t:t+' 🔒'; });
+  var dash=document.getElementById('s-dash'); if(!dash) return;
+  var ban=document.getElementById('sec-pro-banner');
+  if(!ban){ ban=document.createElement('div'); ban.id='sec-pro-banner'; dash.insertBefore(ban,dash.firstChild); }
+  ban.innerHTML=esPro()?'<div class="pro-card" style="padding:12px 16px"><b>⭐ RutaSEC Pro activo.</b> <span class="pro-muted">Tienes todo desbloqueado.</span></div>':
+   '<div class="pro-card"><b>Estás usando RutaSEC gratis.</b><p class="pro-muted" style="margin:6px 0">Gratis: Normativa, Materiales, el diagnóstico de 15 preguntas y el glosario.</p><p style="margin:6px 0 12px">Con <b>RutaSEC Pro</b> ('+PRO.precio+', pago único) desbloqueas los otros 6 módulos, la evaluación intermedia, la simulación de examen y el Modo Trivia.</p><button class="btn btn-primary" type="button" onclick="goScreen(\'s-pro\')">⭐ Desbloquear RutaSEC Pro</button></div>';
+ }
+ document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('[data-secpro-act]'); if(!b) return;
+  var inp=document.getElementById('sec-procode'), msg=document.getElementById('sec-promsg'); if(!inp) return;
+  if(!norm(inp.value)){msg.textContent='Escribe tu código, por ejemplo RS-7K3M-Q9PX.';inp.focus();return}
+  b.disabled=true; msg.textContent='Revisando…';
+  activar(inp.value).then(function(ok){
+   b.disabled=false;
+   if(ok){msg.textContent='✅ ¡Listo! RutaSEC Pro quedó activo en este equipo.'; pintarNav(); setTimeout(function(){window.goScreen('s-dash'); if(typeof renderDash==='function') renderDash();},1200);}
+   else msg.textContent='Ese código no es válido. Revisa que esté bien escrito (letras y números, sin espacios).';
+  });
+ });
+ document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.id==='sec-procode'){var b=document.querySelector('[data-secpro-act]');if(b)b.click()}});
+ pintarNav();
+ var act=document.querySelector('.screen.active'); if(act&&NOMBRES[act.id]&&!esPro()) window.goScreen('s-dash');
+})();
+</script>
+
 </body>
 
 </html>
