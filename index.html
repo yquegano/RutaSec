@@ -1832,10 +1832,24 @@ function tEnd(){let medal='⭐',msg='¡Sigue practicando!';if(tLives>0&&tIdx>=tD
  function hex(buf){return Array.prototype.map.call(new Uint8Array(buf),function(x){return ('0'+x.toString(16)).slice(-2)}).join('')}
  function esPro(){try{return localStorage.getItem(PRO.key)==='1'}catch(e){return false}}
  window.esProSEC=esPro;
+ /* 10 nov 2026 · Códigos de un solo uso: si PRO.registro tiene la URL /exec del registro (Apps Script),
+    el código se marca como usado en la planilla y no sirve en otro equipo. Si está vacío, funciona como antes. */
+ PRO.registro=''; PRO.app='rutasec'; var PRO_MOTIVO='';
+ var MOTIVOS={no_valido:'Ese código no es válido. Revisa que esté bien escrito (letras y números, sin espacios).',usado:'Ese código ya se activó en otro equipo. Cada código sirve una sola vez. Si cambiaste de equipo, escríbenos a '+PRO.correo+'.',anulado:'Ese código está anulado. Escríbenos a '+PRO.correo+'.',otra_app:'Ese código es de otra app.',no_existe:'Ese código no está registrado. Escríbenos a '+PRO.correo+'.',sin_internet:'Para activar tu código necesitas internet (solo esta vez). Conéctate y vuelve a intentarlo.',error:'No pudimos revisar el código ahora. Intenta de nuevo en unos minutos.'};
+ function equipoId(){var k=PRO.key+'_equipo',v=null;try{v=localStorage.getItem(k)}catch(e){}if(!v){v=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2));try{localStorage.setItem(k,v)}catch(e){}}return v;}
  function activar(c){
-  if(!(window.crypto&&crypto.subtle&&window.TextEncoder)) return Promise.resolve(false);
+  PRO_MOTIVO='';
+  if(!(window.crypto&&crypto.subtle&&window.TextEncoder)){PRO_MOTIVO='error';return Promise.resolve(false);}
   return crypto.subtle.digest('SHA-256',new TextEncoder().encode(PRO.salt+norm(c))).then(function(b){
-   var ok=PRO.hashes.indexOf(hex(b).slice(0,20))>=0; if(ok){try{localStorage.setItem(PRO.key,'1')}catch(e){}} return ok;});
+   var ok=PRO.hashes.indexOf(hex(b).slice(0,20))>=0;
+   if(!ok){PRO_MOTIVO='no_valido';return false;}
+   if(!PRO.registro){try{localStorage.setItem(PRO.key,'1')}catch(e){}return true;}
+   var url=PRO.registro+'?accion=activar&app='+encodeURIComponent(PRO.app)+'&codigo='+encodeURIComponent(norm(c))+'&equipo='+encodeURIComponent(equipoId());
+   return fetch(url).then(function(r){return r.json()}).then(function(j){
+    if(j&&j.ok){try{localStorage.setItem(PRO.key,'1')}catch(e){}return true;}
+    PRO_MOTIVO=(j&&j.motivo)||'error';return false;
+   }).catch(function(){PRO_MOTIVO=navigator.onLine===false?'sin_internet':'error';return false;});
+  });
  }
  var css=document.createElement('style');
  css.textContent='.pro-card{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--accent3);border-radius:var(--radius);padding:20px;margin-bottom:14px}.pro-card h2{font-size:20px;margin:6px 0 8px}.pro-card ul{margin:8px 0 14px 18px;padding:0;line-height:1.7;color:var(--text)}.pro-in{display:flex;gap:8px;flex-wrap:wrap}.pro-in input{flex:1 1 180px;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);text-transform:uppercase}.pro-in .btn{width:auto}.pro-muted{color:var(--muted);font-size:13px;line-height:1.6}.pro-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#0d0f14;background:var(--accent3);border-radius:20px;padding:3px 10px}';
@@ -1882,7 +1896,7 @@ function tEnd(){let medal='⭐',msg='¡Sigue practicando!';if(tLives>0&&tIdx>=tD
   activar(inp.value).then(function(ok){
    b.disabled=false;
    if(ok){msg.textContent='✅ ¡Listo! RutaSEC Pro quedó activo en este equipo.'; pintarNav(); setTimeout(function(){window.goScreen('s-dash'); if(typeof renderDash==='function') renderDash();},1200);}
-   else msg.textContent='Ese código no es válido. Revisa que esté bien escrito (letras y números, sin espacios).';
+   else msg.textContent=MOTIVOS[PRO_MOTIVO]||MOTIVOS.no_valido;
   });
  });
  document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.id==='sec-procode'){var b=document.querySelector('[data-secpro-act]');if(b)b.click()}});
