@@ -1024,7 +1024,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div class="screen" id="s-creditos">
   <button class="back-btn" onclick="goScreen('s-dash')">← Volver al inicio</button>
   <div style="font-size:22px;font-weight:900;margin-bottom:4px">🌐 Créditos y Bibliografía</div>
-  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Fuentes oficiales donde encontrar la información que sustenta este curso</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Fuentes oficiales donde encontrar la información que sustenta este curso · <a href="privacidad.html" target="_blank" rel="noopener" style="color:inherit">Política de privacidad</a></div>
 
   <div class="card">
     <div class="card-label">📜 Normativa oficial</div>
@@ -1863,7 +1863,7 @@ function tEnd(){let medal='⭐',msg='¡Sigue practicando!';if(tLives>0&&tIdx>=tD
    '<p id="sec-promsg" class="pro-muted" style="min-height:1.6em;margin-top:8px" aria-live="polite"></p>'+
    '<div class="sec-title" style="margin-top:6px">¿Cómo consigo mi código?</div>'+
    (PRO.compra?'<p><a class="btn btn-primary" href="'+PRO.compra+'" target="_blank" rel="noopener">⭐ Comprar RutaSEC Pro</a></p>':'')+
-   '<p class="pro-muted">Escríbenos a <b style="user-select:all;color:var(--text)">'+PRO.correo+'</b> y te enviamos tu código. Si tu instituto usa RutaSEC, pídeselo a tu instituto.</p></div>';
+   '<p class="pro-muted">Escríbenos a <b style="user-select:all;color:var(--text)">'+PRO.correo+'</b> y te enviamos tu código. Si tu instituto usa RutaSEC, pídeselo a tu instituto.</p><p class="pro-muted" style="font-size:13px"><a href="privacidad.html" target="_blank" rel="noopener" style="color:inherit">Política de privacidad</a></p></div>';
  }
  var scr=document.createElement('div'); scr.className='screen'; scr.id='s-pro';
  scr.innerHTML='<button class="back-btn" onclick="goScreen(\'s-dash\');renderDash()">← Volver al inicio</button><div id="pro-box"></div>';
